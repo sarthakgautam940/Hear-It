@@ -1,0 +1,401 @@
+/* App shell: sidebar, frosted top bar, content region. */
+
+.hi-shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--bg-canvas);
+  position: relative;
+  isolation: isolate;
+}
+
+.hi-sidebar,
+.hi-shell__body {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-width: 0;
+}
+
+.hi-sidebar {
+  flex: none;
+  width: var(--sidebar-w);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg-shell);
+  border-right: 1px solid var(--border-hairline);
+  transition: width var(--m-surface) var(--ease-arrive);
+}
+
+.hi-sidebar[data-collapsed="true"] {
+  width: var(--sidebar-rail-w);
+}
+
+.hi-shell[data-resizing="true"] .hi-sidebar {
+  transition: none;
+}
+
+.hi-shell[data-resizing="true"] {
+  cursor: col-resize;
+  user-select: none;
+}
+
+/* The seam: a wide invisible target over a hairline. */
+.hi-sidebar__grip {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  z-index: 2;
+  cursor: col-resize;
+  touch-action: none;
+  background: transparent;
+}
+
+.hi-sidebar__grip::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 2px;
+  background: var(--accent);
+  opacity: 0;
+  transition: opacity var(--m-control) var(--ease-arrive);
+}
+
+.hi-sidebar__grip:hover::after,
+.hi-sidebar__grip:focus-visible::after,
+.hi-shell[data-resizing="true"] .hi-sidebar__grip::after {
+  opacity: 1;
+}
+
+.hi-sidebar__grip:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: -2px;
+}
+
+@media (hover: none) {
+  .hi-sidebar__grip {
+    display: none;
+  }
+}
+
+.hi-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 18px 16px 10px;
+  color: var(--text-primary);
+  text-decoration: none;
+  flex: none;
+  min-width: 0;
+}
+
+.hi-brand__name {
+  min-width: 0;
+  font-size: 18px;
+  font-weight: var(--w-mark);
+  letter-spacing: -0.012em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hi-brand__mark {
+  flex: none;
+  color: var(--text-primary);
+}
+
+.hi-sidebar[data-collapsed="true"] .hi-brand {
+  justify-content: center;
+  padding: 18px 8px 10px;
+}
+
+.hi-nav {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+}
+
+.hi-nav__group {
+  padding: 10px;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.hi-nav__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: 520;
+  white-space: nowrap;
+  min-width: 0;
+  color: var(--text-secondary);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background var(--m-control) var(--ease-arrive),
+    color var(--m-control) var(--ease-arrive);
+}
+
+.hi-nav__item:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.hi-nav__item:hover .hi-nav__icon {
+  color: var(--text-primary);
+}
+
+/* Selection is one signal: a tonal fill. */
+.hi-nav__item[data-active="true"] {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  font-weight: 560;
+}
+
+.hi-nav__icon {
+  flex: none;
+  color: var(--text-tertiary);
+}
+
+.hi-nav__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hi-nav__group .hi-nav__item {
+  min-height: 38px;
+  font-size: 15px;
+  color: var(--text-tertiary);
+}
+
+.hi-sidebar[data-collapsed="true"] .hi-nav__item {
+  justify-content: center;
+  padding: 0;
+}
+
+.hi-topbar {
+  height: var(--topbar-h);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 clamp(16px, 2vw, 24px);
+  min-width: 0;
+}
+
+.hi-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.hi-breadcrumb__current {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 16px;
+  font-weight: 560;
+  color: var(--text-primary);
+}
+
+.hi-topbar__utility {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* The live word: what the microphone is doing, visible on every screen. */
+.hi-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 560;
+  color: var(--text-primary);
+  background: var(--accent-tint);
+  white-space: nowrap;
+}
+
+.hi-live:hover {
+  background: var(--bg-hover);
+}
+
+.hi-shell__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.hi-main {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  padding: 28px clamp(20px, 3.4vw, 64px) 96px;
+  outline: none;
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 720px) {
+  .hi-main {
+    padding: 20px 16px 48px;
+  }
+}
+
+/* Top-bar search: a button; the palette owns the field. */
+.hi-topsearch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  width: clamp(180px, 26vw, 320px);
+  padding: 0 10px 0 14px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--bg-surface2);
+  box-shadow: inset 0 0 0 1px var(--border-hairline);
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    color var(--m-control) var(--ease-arrive),
+    box-shadow var(--m-control) var(--ease-arrive);
+}
+
+.hi-topsearch:hover {
+  color: var(--text-secondary);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.hi-topsearch__label {
+  flex: 1;
+  text-align: left;
+}
+
+.hi-topsearch__kbd {
+  flex: none;
+  font: inherit;
+  font-size: 14px;
+  letter-spacing: 0.01em;
+  color: var(--text-tertiary);
+}
+
+@media (max-width: 900px) {
+  .hi-topsearch__kbd {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .hi-topsearch {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+  .hi-topsearch__label {
+    display: none;
+  }
+}
+
+/* Below 1024 the sidebar leaves the flow and becomes a drawer. */
+@media (max-width: 1023px) {
+  .hi-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 40;
+    width: min(300px, 84vw);
+    transform: translate3d(-100%, 0, 0);
+    transition:
+      transform var(--m-surface) var(--ease-arrive),
+      visibility var(--m-surface) step-end;
+    visibility: hidden;
+    box-shadow: var(--e2);
+  }
+  .hi-sidebar[data-open="true"] {
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+    transition:
+      transform var(--m-surface) var(--ease-arrive),
+      visibility 0s;
+  }
+  .hi-sidebar[data-collapsed="true"] {
+    width: min(300px, 84vw);
+  }
+  .hi-drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 39;
+    background: var(--scrim);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--m-surface) var(--ease-arrive);
+  }
+  .hi-drawer-scrim[data-open="true"] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .hi-topbar__menu {
+    flex: none;
+    margin-right: 2px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hi-drawer-scrim,
+  .hi-topbar__menu {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hi-sidebar,
+  .hi-drawer-scrim {
+    transition: none;
+  }
+}
+
+:root[data-motion="reduced"] .hi-sidebar,
+:root[data-motion="reduced"] .hi-drawer-scrim {
+  transition: none;
+}
+
+/* Focus never scrolls under the sticky bar (WCAG 2.4.11). */
+.hi-app :is(a, button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])) {
+  scroll-margin-top: calc(var(--topbar-h) + 16px);
+}
+
+@media (pointer: coarse) {
+  .hi-nav__item {
+    min-height: 44px;
+  }
+}

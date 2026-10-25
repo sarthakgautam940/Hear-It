@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+*.tsbuildinfo
+
+# Built from src/platform at build time; never edited by hand.
+public/audio/
+public/sw.js
+
+.DS_Store
+.env*
+.vercel
