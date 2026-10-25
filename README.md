@@ -102,7 +102,7 @@ src/app         Next.js routes: /, /people, /room, /self-test, /report, /setting
 src/styles      design tokens and plain CSS, paper and night themes, high contrast and color-vision palettes, text size
 tests/core      Vitest suites with reference values from the standards and papers above
 validation      the protocol, the raw data sheet and the analysis script
-scripts         bundles the worklet and service worker with esbuild before dev and build
+scripts         bundles the worklet and service worker with esbuild; the Next config runs it whenever a build or the dev server starts with the bundles out of date
 ```
 
 ## Libraries and licenses
