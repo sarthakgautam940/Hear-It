@@ -91,3 +91,41 @@ function share(utterances: readonly Utterance[], id: string): number | null {
   if (utterances.length === 0) return null;
   return utterances.filter((u) => u.inReach.includes(id)).length / utterances.length;
 }
+
+/**
+ * The share of sentences that reached every person at the table, or null when
+ * nobody was seated or nothing was said.
+ */
+export function everyoneShare(s: Session): number | null {
+  if (s.listenerIds.length === 0 || s.utterances.length === 0) return null;
+  const reachedAll = s.utterances.filter((u) =>
+    s.listenerIds.every((id) => u.inReach.includes(id)),
+  ).length;
+  return reachedAll / s.utterances.length;
+}
+
+export interface ShareTrend {
+  /** One value per conversation, oldest first; null where nobody was seated. */
+  values: Array<number | null>;
+  mean: number | null;
+}
+
+/** The everyone-share of the most recent conversations, from a list kept newest first. */
+export function shareTrend(sessions: readonly Session[], count: number): ShareTrend {
+  const values = sessions
+    .slice(0, count)
+    .map((s) => everyoneShare(s))
+    .reverse();
+  const known = values.filter((v): v is number => v !== null);
+  return {
+    values,
+    mean: known.length > 0 ? known.reduce((sum, v) => sum + v, 0) / known.length : null,
+  };
+}
+
+/** How long a session ran, in seconds, or null while it is open. */
+export function sessionSeconds(s: Session): number | null {
+  if (!s.endedAt) return null;
+  const seconds = (new Date(s.endedAt).getTime() - new Date(s.startedAt).getTime()) / 1000;
+  return Number.isFinite(seconds) && seconds >= 0 ? seconds : null;
+}

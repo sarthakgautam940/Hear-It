@@ -1,438 +1,258 @@
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/InterVariable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Source Serif 4";
+  src: url("/fonts/SourceSerif4-Variable.woff2") format("woff2");
+  font-weight: 200 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /*
- * Design tokens. Brand constants and the two ground ramps are declared once at
- * :root as raw values; the theme blocks only map semantic tokens onto them, so
- * a tuning pass edits one number and every theme moves with it.
- *
- * Themes: paper and night, each in regular or high contrast, each in the
- * standard or color-vision palette, plus "system", which resolves from the OS.
- * Color is never the only channel: every state also ships as a word.
- */
-
+  Hear It tokens, "the lit table". Paper and ink carry the interface; the table
+  is the one picture, and marigold marks only the voice and the seats it reaches.
+  Every text pair clears 4.5:1 and body text 7:1 in both themes. Type is in rem on
+  a root that follows the phone's own text size.
+*/
 :root {
-  --brand-cream: #f3f1e8;
-  --brand-paper: #ffffff;
-  --brand-ink: #171614;
-  --brand-gray: #57544f;
-  --brand-hairline: #e4e1d5;
-  --brand-signal: #234875;
-  --brand-signal-deep: #1b385b;
-  --brand-signal-tint: #ebeff3;
-  --brand-warn: #82630d;
-  --brand-warn-tint: #ebe6d8;
-  --brand-alert: #b3261e;
-  --brand-alert-tint: #f8eceb;
+  --font-sans: "Inter", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  /* Inter's l with a tail and I with serifs keep I, l and 1 apart. */
+  --font-features: "cv05", "cv08";
 
-  --p-shell: #ebe8dd;
-  --p-canvas: #f3f1e8;
-  --p-surface: #ffffff;
-  --p-surface2: #faf9f4;
-  --p-surface3: #f0eee4;
-  --p-inset: #eae7dc;
-  --p-hover: #eae7dc;
-  --p-active: #e2dfd2;
-  --p-hairline: #e4e1d5;
-  --p-strong: #cfcbbc;
-  /* Control edges sit at a 3:1 floor against every ground they can rest on
-     (WCAG 1.4.11); a hairline is for separating planes, not for finding a field. */
-  --p-control: #7d7a6b;
-  --p-control-hover: #57544f;
-  --p-text: #171614;
-  --p-text-2: #57544f;
-  --p-text-3: #625f58;
-  --p-text-off: #908480;
-  --p-chip: #dcd9cc;
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 12px;
+  --s-4: 16px;
+  --s-5: 20px;
+  --s-6: 24px;
+  --s-8: 32px;
+  --s-10: 40px;
+  --s-12: 48px;
+  --s-16: 64px;
+  --margin: 24px;
 
-  --n-shell: #0f0e0d;
-  --n-canvas: #171614;
-  --n-surface: #1f1e1b;
-  --n-surface2: #272521;
-  --n-surface3: #2f2d28;
-  --n-inset: #0b0a09;
-  --n-hover: #2b2925;
-  --n-active: #34322c;
-  --n-hairline: rgba(245, 243, 236, 0.1);
-  --n-strong: rgba(245, 243, 236, 0.17);
-  --n-control: rgba(245, 243, 236, 0.44);
-  --n-control-hover: rgba(245, 243, 236, 0.62);
-  --n-text: #f5f3ec;
-  --n-text-2: rgba(245, 243, 236, 0.72);
-  --n-text-3: rgba(245, 243, 236, 0.58);
-  --n-text-off: rgba(245, 243, 236, 0.36);
-  --n-chip: #302e29;
+  /* One radius family for controls, one for heroes; nested corners stay concentric. */
+  --r-field: 16px;
+  --r-row: 16px;
+  --r-card: 24px;
+  --r-hero: 36px;
+  --r-sheet: 32px;
+  --r-full: 999px;
 
-  --n-signal: #7ea6d8;
-  --n-signal-hover: #93b4e0;
-  --n-signal-pressed: #6890c4;
-  --n-warn: #d3aa50;
-  --n-alert: #e2867e;
-}
+  /* Six styles: display and title in the serif, everything else in Inter, nothing under 16 px. */
+  --t-display: 2.588rem;
+  --t-large: 2rem;
+  --t-title: 2rem;
+  --t-title2: 1.294rem;
+  --t-title3: 1.294rem;
+  --t-body: 1.059rem;
+  --t-callout: 0.941rem;
+  --t-subhead: 0.941rem;
+  --t-label: 0.941rem;
 
-:root,
-[data-theme="paper"],
-[data-theme="system"] {
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+  --dur-press: 140ms;
+  --dur-fade: 200ms;
+  --dur-reach: 280ms;
+  /* A head turning to face someone: slower than a control, at a person's pace. */
+  --dur-turn: 480ms;
+  /* A spring a touch under critical damping, 460 ms long: overshoots by 3% and settles. */
+  --spring: linear(
+    0,
+    0.0286,
+    0.1003,
+    0.1979,
+    0.308,
+    0.4207,
+    0.5291,
+    0.6288,
+    0.7171,
+    0.7929,
+    0.856,
+    0.9071,
+    0.9471,
+    0.9774,
+    0.9994,
+    1.0145,
+    1.0241,
+    1.0294,
+    1.0314,
+    1.0311,
+    1.0293,
+    1.0264,
+    1.023,
+    1.0195,
+    1.016,
+    1.0127,
+    1.0098,
+    1.0073,
+    1
+  );
+  --dur-spring: 460ms;
+  --dur-sheet: 360ms;
+
+  --tap: 48px;
+  --tap-primary: 56px;
+  --row: 64px;
+  --tabbar-h: 66px;
+
   color-scheme: light;
+  --bg: #f6f6f4;
+  --surface: #ffffff;
+  --raised: #ffffff;
+  --control: #eeece6;
+  --control-press: #e3e0d8;
+  --text-1: #141414;
+  --text-2: #4a4946;
+  --text-3: #6b6964;
+  /* Actions are ink: the one accent for doing something. */
+  --ink: #141414;
+  --ink-press: #2c2c2c;
+  --on-ink: #ffffff;
+  --voice: var(--ink);
+  --voice-press: var(--ink-press);
+  --on-voice: var(--on-ink);
+  --voice-line: var(--ink);
+  --voice-text: var(--text-1);
+  --voice-wash: #fff0c4;
+  --danger: #b42f25;
+  --danger-wash: #f6e3e0;
+  /* The red behind white words, the same in both themes. */
+  --danger-fill: #b42f25;
+  --ring: rgba(20, 20, 20, 0.12);
+  --hairline: rgba(20, 20, 20, 0.06);
+  --glass: rgba(255, 255, 255, 0.94);
+  --glass-edge: rgba(20, 20, 20, 0.07);
+  --glass-shadow: 0 1px 2px rgba(20, 20, 20, 0.06), 0 8px 24px rgba(20, 20, 20, 0.08);
+  --card-shadow: 0 1px 2px rgba(20, 20, 20, 0.04);
+  --sheet-shadow: 0 -12px 40px rgba(0, 0, 0, 0.12);
+  --scrim: rgba(0, 0, 0, 0.36);
+  --behind-sheet: #d8d8d4;
+  --stage: #e8e8e5;
+  --status-ink: #141414;
+  --sheet-bg: #ffffff;
+  --sheet-card: #f1efea;
+  --seg-on: var(--ink);
 
-  --bg-shell: var(--p-shell);
-  --bg-canvas: var(--p-canvas);
-  --bg-surface: var(--p-surface);
-  --bg-surface2: var(--p-surface2);
-  --bg-surface3: var(--p-surface3);
-  --bg-inset: var(--p-inset);
-  --bg-hover: var(--p-hover);
-  --bg-active: var(--p-active);
+  /* The table: the same in both themes, a lit object on the page. */
+  --table-room: #f2eadc;
+  --table-ink: #141414;
+  --table-ink-2: #55503f;
+  --marigold: #f5c242;
+  --marigold-edge: #d9a21e;
+  --marigold-soft: #f9da86;
 
-  --border-hairline: var(--p-hairline);
-  --border-strong: var(--p-strong);
-  --border-control: var(--p-control);
-  --border-control-hover: var(--p-control-hover);
-  --border-accent: rgba(35, 72, 117, 0.45);
-
-  --text-primary: var(--p-text);
-  --text-secondary: var(--p-text-2);
-  --text-tertiary: var(--p-text-3);
-  --text-disabled: var(--p-text-off);
-  --chip-neutral: var(--p-chip);
-
-  --accent: var(--brand-signal);
-  --accent-hover: var(--brand-signal-deep);
-  --accent-pressed: #16304e;
-  --accent-tint: var(--brand-signal-tint);
-  --accent-tint-soft: #f4f6f9;
-
-  --alarm: var(--brand-alert);
-  --alarm-tint: var(--brand-alert-tint);
-  --caution: var(--brand-warn);
-  --caution-tint: var(--brand-warn-tint);
-
-  --focus-ring: var(--brand-signal);
-  --scrim: rgba(23, 22, 20, 0.4);
-  --on-accent: #ffffff;
-  --on-alarm: #ffffff;
-
-  --ring-hairline: 0 0 0 1px var(--border-hairline);
-  --e1: var(--ring-hairline), 0 1px 2px rgba(23, 22, 20, 0.06);
-  --e2: var(--ring-hairline), 0 4px 12px rgba(23, 22, 20, 0.1);
-  --e3: 0 0 0 1px var(--border-hairline), 0 16px 40px rgba(23, 22, 20, 0.18);
-  --surface-toplight: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --frost-bg: rgba(255, 255, 255, 0.92);
+  /* The table drawing: ink line and flat color, the voice the only marigold. */
+  --art-ink: #1c1a17;
+  --art-shadow: #e3d7c1;
+  --art-cloth: #fffdf9;
+  --art-cloth-line: #e8dfcf;
+  --art-mat: #efe6d5;
+  --art-mat-line: #c9b99c;
+  --art-porcelain: #ffffff;
+  --art-glaze: #f7f2ea;
+  --art-glass: #ece7df;
+  --art-wood: #dcb486;
+  --art-wood-dark: #b88a57;
+  --art-cushion: #f3ead8;
+  --art-terracotta: #c8643f;
+  --art-burgundy: #7c2a37;
+  --art-crust: #cf9555;
+  --art-crust-dark: #9c6631;
+  --art-wheat: #efd9a6;
+  --art-cream: #f7ecd3;
+  --art-coral: #ec9273;
+  --art-charcoal: #3b3733;
+  --art-stone: #a59d92;
+  --art-rose: #dfa9a2;
+  --art-oat: #efe3cc;
+  --art-soil: #6b4a32;
+  --art-skin-1: #f4d0b5;
+  --art-skin-2: #deaa84;
+  --art-skin-3: #b57a52;
+  --art-skin-4: #7a4e36;
+  --art-hair-white: #f6f4ef;
+  --art-hair-white-line: #b9b3a8;
+  --art-hair-silver: #cfcac1;
+  --art-hair-silver-line: #8f897f;
+  --art-hair-gray: #9b958c;
+  --art-hair-gray-line: #5f5a53;
+  --art-hair-black: #2a2623;
+  --art-hair-black-line: #6a625b;
+  --art-hair-chestnut: #6e4229;
+  --art-hair-chestnut-line: #3e2416;
+  --art-hair-auburn: #a2502e;
+  --art-hair-auburn-line: #6a2f17;
 }
 
-[data-theme="night"] {
+:root[data-theme="dark"] {
   color-scheme: dark;
-
-  --bg-shell: var(--n-shell);
-  --bg-canvas: var(--n-canvas);
-  --bg-surface: var(--n-surface);
-  --bg-surface2: var(--n-surface2);
-  --bg-surface3: var(--n-surface3);
-  --bg-inset: var(--n-inset);
-  --bg-hover: var(--n-hover);
-  --bg-active: var(--n-active);
-
-  --border-hairline: var(--n-hairline);
-  --border-strong: var(--n-strong);
-  --border-control: var(--n-control);
-  --border-control-hover: var(--n-control-hover);
-  --border-accent: rgba(126, 166, 216, 0.5);
-
-  --text-primary: var(--n-text);
-  --text-secondary: var(--n-text-2);
-  --text-tertiary: var(--n-text-3);
-  --text-disabled: var(--n-text-off);
-  --chip-neutral: var(--n-chip);
-
-  --accent: var(--n-signal);
-  --accent-hover: var(--n-signal-hover);
-  --accent-pressed: var(--n-signal-pressed);
-  --accent-tint: rgba(126, 166, 216, 0.15);
-  --accent-tint-soft: rgba(126, 166, 216, 0.07);
-
-  --alarm: var(--n-alert);
-  --alarm-tint: rgba(226, 134, 126, 0.15);
-  --caution: var(--n-warn);
-  --caution-tint: rgba(211, 170, 80, 0.14);
-
-  --focus-ring: var(--n-signal);
+  --bg: #0d0d0d;
+  --surface: #191919;
+  --raised: #242424;
+  --control: #242424;
+  --control-press: #2f2f2f;
+  --text-1: #f4f4f2;
+  --text-2: #b9b8b4;
+  --text-3: #92918c;
+  --ink: #f4f4f2;
+  --ink-press: #d9d9d6;
+  --on-ink: #141414;
+  --voice-wash: rgba(245, 194, 66, 0.3);
+  --danger: #ff7a6b;
+  --danger-wash: #3a1f1c;
+  --ring: rgba(244, 244, 242, 0.14);
+  --hairline: rgba(244, 244, 242, 0.08);
+  --glass: rgba(28, 28, 28, 0.94);
+  --glass-edge: rgba(244, 244, 242, 0.1);
+  --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+  --card-shadow: none;
+  --sheet-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
   --scrim: rgba(0, 0, 0, 0.55);
-  --on-accent: #101a26;
-  --on-alarm: #1c0c0a;
-
-  --ring-hairline: 0 0 0 1px var(--border-hairline);
-  --e1:
-    var(--ring-hairline), 0 1px 2px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(245, 243, 236, 0.04);
-  --e2:
-    var(--ring-hairline), 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(245, 243, 236, 0.04);
-  --e3: 0 0 0 1px var(--border-strong), 0 16px 40px rgba(0, 0, 0, 0.55);
-  --surface-toplight: inset 0 1px 0 rgba(245, 243, 236, 0.04);
-  --frost-bg: rgba(25, 24, 21, 0.92);
+  --behind-sheet: #000000;
+  --stage: #050505;
+  --status-ink: #f4f4f2;
+  --sheet-bg: #161616;
+  --sheet-card: #242424;
 }
 
 @media (prefers-color-scheme: dark) {
-  [data-theme="system"] {
+  :root[data-theme="system"] {
     color-scheme: dark;
-
-    --bg-shell: var(--n-shell);
-    --bg-canvas: var(--n-canvas);
-    --bg-surface: var(--n-surface);
-    --bg-surface2: var(--n-surface2);
-    --bg-surface3: var(--n-surface3);
-    --bg-inset: var(--n-inset);
-    --bg-hover: var(--n-hover);
-    --bg-active: var(--n-active);
-
-    --border-hairline: var(--n-hairline);
-    --border-strong: var(--n-strong);
-    --border-control: var(--n-control);
-    --border-control-hover: var(--n-control-hover);
-    --border-accent: rgba(126, 166, 216, 0.5);
-
-    --text-primary: var(--n-text);
-    --text-secondary: var(--n-text-2);
-    --text-tertiary: var(--n-text-3);
-    --text-disabled: var(--n-text-off);
-    --chip-neutral: var(--n-chip);
-
-    --accent: var(--n-signal);
-    --accent-hover: var(--n-signal-hover);
-    --accent-pressed: var(--n-signal-pressed);
-    --accent-tint: rgba(126, 166, 216, 0.15);
-    --accent-tint-soft: rgba(126, 166, 216, 0.07);
-
-    --alarm: var(--n-alert);
-    --alarm-tint: rgba(226, 134, 126, 0.15);
-    --caution: var(--n-warn);
-    --caution-tint: rgba(211, 170, 80, 0.14);
-
-    --focus-ring: var(--n-signal);
+    --bg: #0d0d0d;
+    --surface: #191919;
+    --raised: #242424;
+    --control: #242424;
+    --control-press: #2f2f2f;
+    --text-1: #f4f4f2;
+    --text-2: #b9b8b4;
+    --text-3: #92918c;
+    --ink: #f4f4f2;
+    --ink-press: #d9d9d6;
+    --on-ink: #141414;
+    --voice-wash: rgba(245, 194, 66, 0.3);
+    --danger: #ff7a6b;
+    --danger-wash: #3a1f1c;
+    --ring: rgba(244, 244, 242, 0.14);
+    --hairline: rgba(244, 244, 242, 0.08);
+    --glass: rgba(28, 28, 28, 0.94);
+    --glass-edge: rgba(244, 244, 242, 0.1);
+    --glass-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 8px 24px rgba(0, 0, 0, 0.45);
+    --card-shadow: none;
+    --sheet-shadow: 0 -12px 40px rgba(0, 0, 0, 0.5);
     --scrim: rgba(0, 0, 0, 0.55);
-    --on-accent: #101a26;
-    --on-alarm: #1c0c0a;
-
-    --ring-hairline: 0 0 0 1px var(--border-hairline);
-    --e1:
-      var(--ring-hairline), 0 1px 2px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(245, 243, 236, 0.04);
-    --e2:
-      var(--ring-hairline), 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(245, 243, 236, 0.04);
-    --e3: 0 0 0 1px var(--border-strong), 0 16px 40px rgba(0, 0, 0, 0.55);
-    --surface-toplight: inset 0 1px 0 rgba(245, 243, 236, 0.04);
-    --frost-bg: rgba(25, 24, 21, 0.92);
+    --behind-sheet: #000000;
+    --stage: #050505;
+    --status-ink: #f4f4f2;
+    --sheet-bg: #161616;
+    --sheet-card: #242424;
   }
-}
-
-:root {
-  /* One variable family, so intermediate weights are real steps. */
-  --font-sans: "General Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-
-  --w-mark: 680;
-  --w-voice: 650;
-  --w-structure: 560;
-  --w-label: 520;
-  --w-fine: 450;
-  --w-body: 420;
-
-  --track-display: -0.02em;
-  --track-h2: -0.017em;
-  --track-mid: -0.01em;
-  --track-small: 0.01em;
-
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-5: 24px;
-  --space-6: 32px;
-  --space-7: 48px;
-  --space-8: 64px;
-  --space-9: 96px;
-
-  --radius-sm: 8px;
-  --radius-control: 10px;
-  --radius-card: 16px;
-  --radius-modal: 18px;
-
-  /* Two curves, one job each: arrive for something appearing, step for a value
-     moving between two known states. No spring, no bounce. */
-  --m-state: 80ms;
-  --m-control: 120ms;
-  --m-element: 160ms;
-  --m-surface: 240ms;
-  --m-plate: 320ms;
-  --ease-arrive: cubic-bezier(0.2, 0, 0, 1);
-  --ease-step: cubic-bezier(0.85, 0, 0.15, 1);
-
-  --sidebar-w: 240px;
-  --sidebar-rail-w: 68px;
-  --topbar-h: 48px;
-
-  /* The table display is a dark warm plane in both themes: it faces the room,
-     and a glowing white rectangle at dinner is glare on every face. */
-  --table-bg: #1b1a17;
-  --table-ring: rgba(245, 243, 236, 0.09);
-  --table-outline: rgba(245, 243, 236, 0.2);
-  --table-text: #f5f3ec;
-  --table-text-dim: rgba(245, 243, 236, 0.55);
-  --reach-fill: 226, 196, 138;
-  --reach-preview: rgba(226, 196, 138, 0.55);
-}
-
-[data-theme="paper"][data-contrast="high"],
-[data-theme="system"][data-contrast="high"] {
-  --text-secondary: #2b2a26;
-  --text-tertiary: #3b3934;
-  --text-disabled: #67645d;
-  --border-hairline: #b5b1a3;
-  --border-strong: #8a8778;
-  --border-control: #67645d;
-  --border-control-hover: #3b3934;
-  --border-accent: rgba(23, 48, 78, 0.85);
-  --accent: #16304e;
-  --accent-hover: #101f34;
-  --accent-pressed: #0b1725;
-  --alarm: #8c1d16;
-  --caution: #5f4809;
-}
-
-[data-theme="night"][data-contrast="high"] {
-  --text-secondary: rgba(245, 243, 236, 0.93);
-  --text-tertiary: rgba(245, 243, 236, 0.82);
-  --text-disabled: rgba(245, 243, 236, 0.6);
-  --border-hairline: rgba(245, 243, 236, 0.28);
-  --border-strong: rgba(245, 243, 236, 0.44);
-  --border-control: rgba(245, 243, 236, 0.6);
-  --border-control-hover: rgba(245, 243, 236, 0.78);
-  --border-accent: rgba(174, 202, 240, 0.9);
-  --accent: #aecaf0;
-  --accent-hover: #c3d9f6;
-  --accent-pressed: #93b4e0;
-  --alarm: #f0a09a;
-  --caution: #e5c274;
-}
-
-@media (prefers-color-scheme: dark) {
-  [data-theme="system"][data-contrast="high"] {
-    --text-secondary: rgba(245, 243, 236, 0.93);
-    --text-tertiary: rgba(245, 243, 236, 0.82);
-    --text-disabled: rgba(245, 243, 236, 0.6);
-    --border-hairline: rgba(245, 243, 236, 0.28);
-    --border-strong: rgba(245, 243, 236, 0.44);
-    --border-control: rgba(245, 243, 236, 0.6);
-    --border-control-hover: rgba(245, 243, 236, 0.78);
-    --border-accent: rgba(174, 202, 240, 0.9);
-    --accent: #aecaf0;
-    --accent-hover: #c3d9f6;
-    --accent-pressed: #93b4e0;
-    --alarm: #f0a09a;
-    --caution: #e5c274;
-  }
-}
-
-@media (prefers-contrast: more) {
-  [data-theme="paper"],
-  [data-theme="system"] {
-    --text-secondary: #2b2a26;
-    --text-tertiary: #3b3934;
-    --border-hairline: #b5b1a3;
-    --border-strong: #8a8778;
-    --border-control: #67645d;
-    --border-control-hover: #3b3934;
-  }
-  [data-theme="night"] {
-    --text-secondary: rgba(245, 243, 236, 0.93);
-    --text-tertiary: rgba(245, 243, 236, 0.82);
-    --border-hairline: rgba(245, 243, 236, 0.28);
-    --border-strong: rgba(245, 243, 236, 0.44);
-    --border-control: rgba(245, 243, 236, 0.6);
-    --border-control-hover: rgba(245, 243, 236, 0.78);
-  }
-}
-
-/* One color-vision palette (Okabe and Ito), separated on luminance as well as
-   hue, so it holds across the common forms of color blindness. */
-[data-vision="cvd"] {
-  --accent: #0f5f96;
-  --accent-hover: #0c4e7c;
-  --accent-pressed: #093d61;
-  --accent-tint: #e6eff5;
-  --accent-tint-soft: #f2f7fa;
-  --border-accent: rgba(15, 95, 150, 0.5);
-  --focus-ring: #0f5f96;
-  --alarm: #832e00;
-  --alarm-tint: #f7ebe3;
-  --caution: #856016;
-  --caution-tint: #f3ecd9;
-}
-
-[data-theme="night"][data-vision="cvd"] {
-  --accent: #56b4e9;
-  --accent-hover: #78c6f0;
-  --accent-pressed: #3d9cd2;
-  --accent-tint: rgba(86, 180, 233, 0.16);
-  --accent-tint-soft: rgba(86, 180, 233, 0.08);
-  --border-accent: rgba(86, 180, 233, 0.55);
-  --focus-ring: #56b4e9;
-  --alarm: #ef8c4c;
-  --alarm-tint: rgba(239, 140, 76, 0.16);
-  --caution: #f2d07a;
-  --caution-tint: rgba(242, 208, 122, 0.14);
-}
-
-@media (prefers-color-scheme: dark) {
-  [data-theme="system"][data-vision="cvd"] {
-    --accent: #56b4e9;
-    --accent-hover: #78c6f0;
-    --accent-pressed: #3d9cd2;
-    --accent-tint: rgba(86, 180, 233, 0.16);
-    --accent-tint-soft: rgba(86, 180, 233, 0.08);
-    --border-accent: rgba(86, 180, 233, 0.55);
-    --focus-ring: #56b4e9;
-    --alarm: #ef8c4c;
-    --alarm-tint: rgba(239, 140, 76, 0.16);
-    --caution: #f2d07a;
-    --caution-tint: rgba(242, 208, 122, 0.14);
-  }
-}
-
-[data-theme="paper"][data-contrast="high"][data-vision="cvd"],
-[data-theme="system"][data-contrast="high"][data-vision="cvd"] {
-  --accent: #0a4570;
-  --accent-hover: #073250;
-  --accent-pressed: #052338;
-  --accent-tint: #e6eff5;
-  --border-accent: rgba(10, 69, 112, 0.85);
-  --focus-ring: #0a4570;
-  --alarm: #7d2c00;
-  --caution: #7a5612;
-}
-
-[data-theme="night"][data-contrast="high"][data-vision="cvd"] {
-  --accent: #8fd0f5;
-  --accent-hover: #aadff9;
-  --accent-pressed: #6bbdec;
-  --accent-tint: rgba(143, 208, 245, 0.18);
-  --border-accent: rgba(143, 208, 245, 0.9);
-  --focus-ring: #8fd0f5;
-  --alarm: #ea9057;
-  --caution: #f4dc9c;
-}
-
-@media (prefers-color-scheme: dark) {
-  [data-theme="system"][data-contrast="high"][data-vision="cvd"] {
-    --accent: #8fd0f5;
-    --accent-hover: #aadff9;
-    --accent-pressed: #6bbdec;
-    --accent-tint: rgba(143, 208, 245, 0.18);
-    --border-accent: rgba(143, 208, 245, 0.9);
-    --focus-ring: #8fd0f5;
-    --alarm: #ea9057;
-    --caution: #f4dc9c;
-  }
-}
-
-/* The type scale is in px, so the whole composition zooms together and keeps
-   its proportions, which is what someone asking for bigger text wants. */
-[data-textsize="large"] body {
-  zoom: 1.125;
-}
-[data-textsize="larger"] body {
-  zoom: 1.25;
 }

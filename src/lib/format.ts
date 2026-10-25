@@ -1,15 +1,20 @@
 import { REACH_MAX_M, REACH_MIN_M } from "@/core/reach";
 
+/* Tenths of a meter, with a whole number left whole: "1.5 m", "2 m". */
+function meters(m: number): string {
+  return `${Number(m.toFixed(1))} m`;
+}
+
 export function fmtMeters(m: number): string {
   if (m <= REACH_MIN_M) return "under half a meter";
   if (m >= REACH_MAX_M) return "across the room";
-  return `about ${m.toFixed(1)} m`;
+  return `about ${meters(m)}`;
 }
 
 export function fmtMetersShort(m: number): string {
-  if (m <= REACH_MIN_M) return "< 0.5 m";
-  if (m >= REACH_MAX_M) return "6 m+";
-  return `${m.toFixed(1)} m`;
+  if (m <= REACH_MIN_M) return "under 0.5 m";
+  if (m >= REACH_MAX_M) return "over 6 m";
+  return meters(m);
 }
 
 export function fmtDb(x: number, digits = 0): string {

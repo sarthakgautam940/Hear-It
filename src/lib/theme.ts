@@ -1,32 +1,33 @@
 export const THEME_KEY = "hearit-theme";
-export const MOTION_KEY = "hearit-motion";
-export const CONTRAST_KEY = "hearit-contrast";
-export const VISION_KEY = "hearit-vision";
 export const TEXTSIZE_KEY = "hearit-textsize";
+export const MOTION_KEY = "hearit-motion";
+export const ONBOARDED_KEY = "hearit.v1.onboarded";
 
-export type ThemeChoice = "paper" | "night" | "system";
-export type MotionChoice = "system" | "reduced";
-export type ContrastChoice = "system" | "high";
-export type VisionChoice = "default" | "cvd";
+export type ThemeChoice = "system" | "light" | "dark";
 export type TextSizeChoice = "default" | "large" | "larger";
+export type MotionChoice = "system" | "reduced";
 
-export const THEME_CHOICES: readonly ThemeChoice[] = ["paper", "night", "system"];
-export const MOTION_CHOICES: readonly MotionChoice[] = ["system", "reduced"];
-export const CONTRAST_CHOICES: readonly ContrastChoice[] = ["system", "high"];
-export const VISION_CHOICES: readonly VisionChoice[] = ["default", "cvd"];
+export const THEME_CHOICES: readonly ThemeChoice[] = ["system", "light", "dark"];
 export const TEXTSIZE_CHOICES: readonly TextSizeChoice[] = ["default", "large", "larger"];
+export const MOTION_CHOICES: readonly MotionChoice[] = ["system", "reduced"];
+
+/* The device as drawn, in points, plus the margin it keeps from the window edge. */
+const DEVICE_W = 430;
+const DEVICE_H = 902;
+const STAGE_MARGIN = 48;
 
 /**
- * Stamps every persisted preference on <html> before first paint, so neither
- * theme flashes and text never jumps a size. Each value falls back to its
- * default rather than throwing.
+ * Runs before first paint: stamps every stored preference on <html> so no theme
+ * or text size flashes, and fits the drawn phone to the window. Values from the
+ * first build ("paper", "night") are carried over.
  */
-export const THEME_BOOT_SCRIPT = `(function(){var d=document.documentElement;function g(k,v,f){try{var x=localStorage.getItem(k);return v.indexOf(x)>-1?x:f}catch(e){return f}}
-d.dataset.theme=g("${THEME_KEY}",["paper","night","system"],"system");
-if(g("${MOTION_KEY}",["reduced"],"")==="reduced")d.dataset.motion="reduced";
-if(g("${CONTRAST_KEY}",["high"],"")==="high")d.dataset.contrast="high";
-if(g("${VISION_KEY}",["cvd"],"")==="cvd")d.dataset.vision="cvd";
-var s=g("${TEXTSIZE_KEY}",["large","larger"],"");if(s)d.dataset.textsize=s;})();`;
+export const BOOT_SCRIPT = `(function(){var d=document.documentElement;function g(k){try{return localStorage.getItem(k)}catch(e){return null}}
+var t=g("${THEME_KEY}");if(t==="paper")t="light";if(t==="night")t="dark";d.dataset.theme=t==="light"||t==="dark"?t:"system";
+var s=g("${TEXTSIZE_KEY}");if(s==="large"||s==="larger")d.dataset.textsize=s;
+if(g("${MOTION_KEY}")==="reduced")d.dataset.motion="reduced";
+if(g("${ONBOARDED_KEY}")==="1")d.dataset.onboarded="1";
+function fit(){var k=Math.min(1,(innerHeight-${STAGE_MARGIN})/${DEVICE_H},(innerWidth-${STAGE_MARGIN})/${DEVICE_W});d.style.setProperty("--device-scale",String(Math.max(0.4,k)))}
+fit();addEventListener("resize",fit);})();`;
 
 export function readPreference<T extends string>(
   key: string,
@@ -35,6 +36,8 @@ export function readPreference<T extends string>(
 ): T {
   try {
     const stored = localStorage.getItem(key);
+    if (key === THEME_KEY && stored === "paper") return "light" as T;
+    if (key === THEME_KEY && stored === "night") return "dark" as T;
     return stored !== null && (allowed as readonly string[]).includes(stored)
       ? (stored as T)
       : fallback;
@@ -43,9 +46,7 @@ export function readPreference<T extends string>(
   }
 }
 
-function stamp(attr: string, key: string, value: string, isDefault: boolean): void {
-  if (isDefault) delete document.documentElement.dataset[attr];
-  else document.documentElement.dataset[attr] = value;
+function persist(key: string, value: string): void {
   try {
     localStorage.setItem(key, value);
   } catch {
@@ -53,35 +54,56 @@ function stamp(attr: string, key: string, value: string, isDefault: boolean): vo
   }
 }
 
+function stamp(attr: "textsize" | "motion", value: string | null): void {
+  if (value === null) delete document.documentElement.dataset[attr];
+  else document.documentElement.dataset[attr] = value;
+}
+
 export function applyTheme(theme: ThemeChoice): void {
   document.documentElement.dataset.theme = theme;
-  try {
-    localStorage.setItem(THEME_KEY, theme);
-  } catch {
-    // Private mode: the choice lasts for the session.
-  }
-}
-
-export function applyMotion(motion: MotionChoice): void {
-  stamp("motion", MOTION_KEY, motion, motion === "system");
-}
-
-export function applyContrast(contrast: ContrastChoice): void {
-  stamp("contrast", CONTRAST_KEY, contrast, contrast === "system");
-}
-
-export function applyVision(vision: VisionChoice): void {
-  stamp("vision", VISION_KEY, vision, vision === "default");
+  persist(THEME_KEY, theme);
 }
 
 export function applyTextSize(size: TextSizeChoice): void {
-  stamp("textsize", TEXTSIZE_KEY, size, size === "default");
+  stamp("textsize", size === "default" ? null : size);
+  persist(TEXTSIZE_KEY, size);
 }
 
-/** Paper or night as the page currently resolves, including the system choice. */
-export function resolvedTheme(): "paper" | "night" {
+export function applyMotion(motion: MotionChoice): void {
+  stamp("motion", motion === "reduced" ? "reduced" : null);
+  persist(MOTION_KEY, motion);
+}
+
+const onboardedListeners = new Set<() => void>();
+
+export function subscribeOnboarded(listener: () => void): () => void {
+  onboardedListeners.add(listener);
+  return () => onboardedListeners.delete(listener);
+}
+
+/* The <html> stamp is the source of truth: the boot script set it before first paint. */
+export function isOnboarded(): boolean {
+  return document.documentElement.dataset.onboarded === "1";
+}
+
+export function markOnboarded(): void {
+  document.documentElement.dataset.onboarded = "1";
+  persist(ONBOARDED_KEY, "1");
+  for (const l of onboardedListeners) l();
+}
+
+export function resetOnboarding(): void {
+  delete document.documentElement.dataset.onboarded;
+  try {
+    localStorage.removeItem(ONBOARDED_KEY);
+  } catch {
+    // Private mode: nothing was stored.
+  }
+  for (const l of onboardedListeners) l();
+}
+
+export function resolvedTheme(): "light" | "dark" {
   const theme = document.documentElement.dataset.theme;
-  if (theme === "night") return "night";
-  if (theme === "paper") return "paper";
-  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper";
+  if (theme === "dark" || theme === "light") return theme;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }

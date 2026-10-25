@@ -1,0 +1,950 @@
+/* Talk: the headline above, the table below it, the action inside the table's card. */
+.hi-talk {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: calc(var(--safe-top) + 6px) var(--margin) calc(var(--chrome-bottom) + 16px);
+}
+
+.hi-talk::-webkit-scrollbar {
+  display: none;
+}
+
+/* Room for two lines of headline and one of detail, so the table never jumps when the words change. */
+.hi-talk__head {
+  flex: none;
+  min-height: calc(var(--t-title) * 2.36 + var(--t-body) * 1.45 + 8px);
+}
+
+.hi-talk__head h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-title);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.hi-talk__head p {
+  margin-top: 8px;
+  color: var(--text-2);
+  text-wrap: pretty;
+}
+
+.hi-talk__head b {
+  color: var(--text-1);
+  font-weight: 650;
+}
+
+/* The table's card: one light object, the same in both themes. */
+.hi-tablecard {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+  margin-top: 16px;
+  border-radius: var(--r-hero);
+  background: var(--table-room);
+  color: var(--table-ink);
+  overflow: hidden;
+}
+
+.hi-tablecard__art {
+  position: relative;
+  flex: 1;
+  min-height: 360px;
+}
+
+.hi-tablecard__dock {
+  flex: none;
+  display: grid;
+  gap: 6px;
+  padding: 0 16px 16px;
+}
+
+.hi-tablecard__status {
+  min-width: 0;
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: var(--t-subhead);
+}
+
+.hi-tablecard__status svg {
+  flex: none;
+}
+
+.hi-tablecard__time {
+  margin-left: 4px;
+  color: var(--table-ink-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.hi-tablecard .hi-banner {
+  background: #fff;
+  color: var(--table-ink);
+}
+
+.hi-roombtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: var(--tap);
+  padding: 0 16px 0 13px;
+  border-radius: var(--r-full);
+  background: #fff;
+  color: var(--table-ink);
+  font-size: var(--t-subhead);
+  font-weight: 600;
+  box-shadow:
+    0 1px 2px rgba(80, 60, 10, 0.1),
+    0 4px 12px rgba(120, 90, 20, 0.1);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.hi-roombtn:active {
+  transform: scale(0.96);
+}
+
+.hi-roombtn__value {
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The table drawing. */
+.hi-tm {
+  position: absolute;
+  inset: 0;
+}
+
+.hi-tm__svg {
+  display: block;
+  overflow: visible;
+}
+
+/* Heads turn toward you one after another; the delay is set per person. */
+.hi-art__head {
+  transition: transform var(--dur-turn) var(--ease-out);
+}
+
+.hi-art__fade {
+  transition: opacity var(--dur-fade) var(--ease-out);
+}
+
+.hi-art__mat {
+  transition: fill var(--dur-reach) var(--ease-out);
+}
+
+/* Someone just added takes their seat, sliding in from behind their chair. */
+.hi-art__arrive {
+  animation: hi-take-seat 360ms var(--ease-out) both;
+}
+
+@keyframes hi-take-seat {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+}
+
+.hi-tm__label,
+.hi-tm__name {
+  font-family: var(--font-sans);
+  font-feature-settings: var(--font-features);
+}
+
+/* A halo in the cloth's color keeps the words clear where they cross a plate or a glass. */
+.hi-tm__label {
+  paint-order: stroke;
+  stroke: var(--art-cloth);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+.hi-tm__name {
+  font-size: 17px;
+  font-weight: 650;
+  fill: var(--table-ink);
+}
+
+.hi-tm__word {
+  font-size: 16px;
+  font-weight: 450;
+  fill: var(--table-ink-2);
+}
+
+.hi-tm__word[data-strong="true"] {
+  font-weight: 600;
+  fill: var(--table-ink);
+}
+
+.hi-tm__hit {
+  position: absolute;
+  border-radius: 16px;
+}
+
+.hi-tm__hit:active {
+  background: rgba(20, 20, 20, 0.06);
+}
+
+/* The seat picker: the table from above, every chair a button. */
+.hi-seats {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  margin: 4px auto 0;
+}
+
+.hi-seats__table {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: var(--r-field);
+  background: var(--control);
+}
+
+.hi-seats__you {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.hi-seats__chair {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 2px solid var(--text-3);
+  background: transparent;
+  color: var(--text-1);
+  font-size: var(--t-body);
+  font-weight: 650;
+  transition:
+    background-color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.hi-seats__chair:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.hi-seats__chair[data-state="on"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.hi-seats__chair[data-state="taken"] {
+  border-color: transparent;
+  background: var(--control-press);
+  color: var(--text-2);
+}
+
+/* People */
+.hi-preview {
+  position: relative;
+  height: 340px;
+  margin-bottom: 28px;
+  border-radius: var(--r-hero);
+  background: var(--table-room);
+  overflow: hidden;
+}
+
+.hi-emptytable {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  margin-bottom: 8px;
+  border-radius: var(--r-hero);
+  background: var(--table-room);
+  overflow: hidden;
+}
+
+/* Scenes: small pictures for empty states and the voice check. */
+.hi-scene {
+  display: block;
+  overflow: visible;
+}
+
+.hi-scene--small {
+  width: 168px;
+  height: auto;
+}
+
+.hi-scene--speech {
+  width: min(100%, 320px);
+  height: auto;
+}
+
+/* History */
+.hi-trend {
+  display: grid;
+  gap: 16px;
+}
+
+.hi-trend__top {
+  display: grid;
+  gap: 4px;
+}
+
+.hi-trend__value {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hi-trend__bars {
+  height: 76px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.hi-trend__bar {
+  flex: 1;
+  min-height: 4px;
+  border-radius: 6px;
+  background: var(--control-press);
+}
+
+.hi-trend__bar[data-last="true"] {
+  background: var(--marigold);
+}
+
+.hi-trend__bar[data-empty="true"] {
+  background: var(--control);
+}
+
+.hi-trend__value small {
+  font-family: var(--font-sans);
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+.hi-trend__line {
+  font-size: var(--t-title3);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.hi-day {
+  margin: 32px 4px 12px;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.hi-day:first-child {
+  margin-top: 0;
+}
+
+.hi-nights {
+  display: grid;
+  gap: 12px;
+}
+
+.hi-nights .hi-swipe {
+  --swipe-r: var(--r-card);
+}
+
+.hi-night {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 18px 20px 20px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow:
+    var(--card-shadow),
+    inset 0 0 0 1px var(--hairline);
+  text-align: left;
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.hi-night:active {
+  transform: scale(0.985);
+}
+
+.hi-night__when {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-2);
+  font-size: var(--t-subhead);
+  font-weight: 600;
+}
+
+.hi-night__when svg {
+  margin-left: auto;
+  color: var(--text-3);
+}
+
+.hi-night__main {
+  font-family: var(--font-display);
+  font-size: 1.647rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hi-night__meta {
+  font-size: var(--t-subhead);
+  color: var(--text-2);
+}
+
+.hi-night__track {
+  position: relative;
+  height: 8px;
+  margin: 2px 0;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--control);
+}
+
+.hi-night__track > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 4px;
+  background: var(--marigold);
+}
+
+/* The night report */
+.hi-hero {
+  display: grid;
+  gap: 6px;
+  padding: 4px 4px 22px;
+}
+
+.hi-hero__value {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hi-hero__value small {
+  font-family: var(--font-sans);
+  font-size: 0.42em;
+  font-weight: 600;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+
+.hi-hero__line {
+  font-size: var(--t-title3);
+  line-height: 1.3;
+  font-weight: 600;
+  text-wrap: balance;
+}
+
+.hi-hero__sub {
+  color: var(--text-2);
+}
+
+.hi-share {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px;
+}
+
+.hi-share__body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.hi-share__top {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.hi-share__name {
+  font-weight: 650;
+}
+
+.hi-share__value {
+  margin-left: auto;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.hi-share__track {
+  position: relative;
+  height: 10px;
+  border-radius: 5px;
+  background: var(--control);
+  overflow: hidden;
+}
+
+.hi-sheet .hi-share__track {
+  background: var(--control-press);
+}
+
+.hi-share__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: 5px;
+  background: var(--marigold);
+}
+
+.hi-share__without {
+  font-size: var(--t-subhead);
+  color: var(--text-2);
+}
+
+/* Settings */
+.hi-voicecard {
+  display: grid;
+  gap: 16px;
+}
+
+.hi-voicecard__top {
+  display: grid;
+  gap: 6px;
+}
+
+.hi-voicecard__label {
+  font-size: var(--t-title3);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.hi-voicecard__empty {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: var(--t-title);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.hi-voicecard__line {
+  color: var(--text-2);
+}
+
+.hi-voicecard__value {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+
+.hi-voicecard__facts {
+  color: var(--text-2);
+  font-size: var(--t-subhead);
+  line-height: 1.4;
+}
+
+.hi-about {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 40px 0 8px;
+  color: var(--text-3);
+  font-size: var(--t-subhead);
+}
+
+/* Voice check */
+.hi-vc {
+  display: grid;
+  gap: 22px;
+}
+
+.hi-vc__lead {
+  display: grid;
+  gap: 8px;
+}
+
+.hi-vc__lead h2 {
+  font-family: var(--font-display);
+  font-size: 1.647rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* While reading, the sentence sits in the middle of the sheet, where the eyes already are. */
+.hi-vc[data-stage="reading"] {
+  min-height: 100%;
+  grid-template-rows: auto auto 1fr auto;
+  gap: 16px;
+}
+
+.hi-vc[data-stage="reading"] .hi-vc__sentence {
+  align-self: center;
+  text-align: center;
+}
+
+.hi-vc[data-stage="reading"] .hi-vc__status {
+  justify-content: center;
+}
+
+.hi-vc__count {
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.hi-vc__status {
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 650;
+  color: var(--text-2);
+}
+
+.hi-confirm {
+  padding: 4px 4px 8px;
+  line-height: 1.5;
+}
+
+.hi-vc__sentence {
+  font-family: var(--font-display);
+  font-size: 1.765rem;
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.008em;
+  text-wrap: pretty;
+}
+
+.hi-steps {
+  display: flex;
+  gap: 5px;
+}
+
+.hi-steps span {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--control);
+  transition: background-color var(--dur-fade) ease;
+}
+
+.hi-sheet .hi-steps span {
+  background: var(--control-press);
+}
+
+.hi-steps span[data-done="true"] {
+  background: var(--text-3);
+}
+
+.hi-steps span[data-current="true"] {
+  background: var(--ink);
+}
+
+/* First run */
+.hi-fr {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  padding: calc(var(--safe-top) + 4px) var(--margin) calc(var(--safe-bottom) + 14px);
+}
+
+/* Where the browser cannot animate between steps (shell.css), each step still eases in. */
+@supports not (view-transition-name: none) {
+  .hi-fr {
+    animation: hi-step-in var(--dur-reach) var(--ease-out);
+  }
+}
+
+@keyframes hi-step-in {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+}
+
+.hi-fr__top {
+  flex: none;
+  height: 48px;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+}
+
+.hi-fr__top > :first-child {
+  justify-self: start;
+}
+
+.hi-fr__skip {
+  justify-self: end;
+}
+
+.hi-fr__art {
+  position: relative;
+  flex: 1 0 auto;
+  min-height: 300px;
+  margin: 12px 0 24px;
+}
+
+.hi-fr__art--compact {
+  flex: 1 1 160px;
+  min-height: 160px;
+  margin-bottom: 20px;
+}
+
+.hi-fr--welcome .hi-fr__art {
+  margin-top: 8px;
+}
+
+.hi-fr__card {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-hero);
+  background: var(--table-room);
+  overflow: hidden;
+}
+
+/* The picture runs a pixel past the card on every side, so no seam of the card shows at its edge. */
+.hi-fr__scene {
+  position: absolute;
+  inset: -1px;
+  display: block;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+}
+
+/* The earbud settles into whichever ear is chosen. */
+.hi-fr__bud {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hi-bud-in 320ms var(--ease-out);
+}
+
+@keyframes hi-bud-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+}
+
+.hi-fr__card > .hi-tm {
+  inset: 18px 0 8px;
+}
+
+.hi-fr__preview {
+  display: grid;
+  align-content: center;
+  gap: 16px;
+  height: 100%;
+  padding: 24px;
+}
+
+.hi-fr__preview-sentence {
+  font-family: var(--font-display);
+  font-size: 1.647rem;
+  line-height: 1.3;
+  font-weight: 500;
+  letter-spacing: -0.008em;
+  text-wrap: pretty;
+}
+
+.hi-fr__text {
+  flex: none;
+  display: grid;
+  gap: 12px;
+}
+
+.hi-fr__text h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-large);
+  line-height: 1.16;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.hi-fr--welcome .hi-fr__text h1 {
+  font-size: var(--t-display);
+  line-height: 1.1;
+  letter-spacing: -0.016em;
+}
+
+.hi-fr__text p {
+  color: var(--text-2);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+
+.hi-fr__text .hi-choices {
+  margin-top: 12px;
+}
+
+/* A step without a picture keeps its words and choices low, next to its actions and the thumb. */
+.hi-fr--plain .hi-fr__text {
+  margin-top: auto;
+}
+
+.hi-fr__actions {
+  flex: none;
+  display: grid;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.hi-fr__note {
+  text-align: center;
+  font-size: var(--t-subhead);
+  color: var(--text-2);
+}
+
+/* A conversation's report: the table as it heard you, then the words. */
+.hi-night__table {
+  position: relative;
+  height: 300px;
+  margin: 4px 0 20px;
+  border-radius: var(--r-hero);
+  background: var(--table-room);
+  color: var(--table-ink);
+  overflow: hidden;
+}
+
+.hi-night__head {
+  display: grid;
+  gap: 6px;
+  padding: 0 4px 8px;
+}
+
+.hi-night__headline {
+  font-family: var(--font-display);
+  font-size: var(--t-large);
+  line-height: 1.16;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+}
+
+.hi-night__sub {
+  color: var(--text-2);
+}
+
+.hi-night__voice {
+  display: grid;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: var(--r-card);
+  background: var(--sheet-card);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* The voice check's ten sentences on one decibel axis. */
+.hi-plot {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.hi-plot__label {
+  font-size: 16px;
+  font-weight: 650;
+  fill: var(--text-2);
+}
+
+.hi-plot__axis {
+  font-size: 16px;
+  font-weight: 500;
+  fill: var(--text-3);
+}
+
+.hi-plot__track {
+  stroke: var(--ring);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.hi-plot__dot {
+  fill: var(--text-3);
+  stroke: var(--sheet-bg);
+  stroke-width: 2;
+}
+
+.hi-plot__mean {
+  stroke: var(--text-1);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.hi-plot [data-tone="voice"] .hi-plot__dot {
+  fill: var(--marigold);
+  stroke: var(--marigold-edge);
+}
+
+.hi-plot [data-tone="voice"] .hi-plot__mean {
+  stroke: var(--text-1);
+}
+
+/* Room */
+.hi-room {
+  display: grid;
+  gap: 20px;
+}
+
+.hi-room__value {
+  font-family: var(--font-display);
+  font-size: var(--t-display);
+  line-height: 1.04;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.hi-room__value small {
+  font-family: var(--font-sans);
+  font-size: 0.42em;
+  margin-left: 4px;
+  letter-spacing: 0;
+}
+
+.hi-room__lead {
+  display: grid;
+  gap: 8px;
+}
+
+.hi-room__lead h2 {
+  font-family: var(--font-display);
+  font-size: 1.647rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hi-meter {
+  height: 10px;
+  border-radius: 5px;
+  background: var(--control);
+  overflow: hidden;
+}
+
+.hi-meter__fill {
+  height: 100%;
+  border-radius: 5px;
+  background: var(--ink);
+  transition: width 120ms linear;
+}

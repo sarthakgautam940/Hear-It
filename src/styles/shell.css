@@ -1,401 +1,535 @@
-/* App shell: sidebar, frosted top bar, content region. */
-
-.hi-shell {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg-canvas);
-  position: relative;
-  isolation: isolate;
-}
-
-.hi-sidebar,
-.hi-shell__body {
-  position: relative;
-  z-index: 1;
-  flex: 1;
-  min-width: 0;
-}
-
-.hi-sidebar {
-  flex: none;
-  width: var(--sidebar-w);
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  background: var(--bg-shell);
-  border-right: 1px solid var(--border-hairline);
-  transition: width var(--m-surface) var(--ease-arrive);
-}
-
-.hi-sidebar[data-collapsed="true"] {
-  width: var(--sidebar-rail-w);
-}
-
-.hi-shell[data-resizing="true"] .hi-sidebar {
-  transition: none;
-}
-
-.hi-shell[data-resizing="true"] {
-  cursor: col-resize;
-  user-select: none;
-}
-
-/* The seam: a wide invisible target over a hairline. */
-.hi-sidebar__grip {
+.hi-app {
+  --tabbar-bottom: max(12px, calc(var(--safe-bottom) - 10px));
+  --chrome-bottom: calc(var(--tabbar-bottom) + var(--tabbar-h));
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 8px;
-  height: 100%;
-  z-index: 2;
-  cursor: col-resize;
-  touch-action: none;
-  background: transparent;
-}
-
-.hi-sidebar__grip::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  width: 2px;
-  background: var(--accent);
-  opacity: 0;
-  transition: opacity var(--m-control) var(--ease-arrive);
-}
-
-.hi-sidebar__grip:hover::after,
-.hi-sidebar__grip:focus-visible::after,
-.hi-shell[data-resizing="true"] .hi-sidebar__grip::after {
-  opacity: 1;
-}
-
-.hi-sidebar__grip:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: -2px;
-}
-
-@media (hover: none) {
-  .hi-sidebar__grip {
-    display: none;
-  }
-}
-
-.hi-brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 18px 16px 10px;
-  color: var(--text-primary);
-  text-decoration: none;
-  flex: none;
-  min-width: 0;
-}
-
-.hi-brand__name {
-  min-width: 0;
-  font-size: 18px;
-  font-weight: var(--w-mark);
-  letter-spacing: -0.012em;
-  white-space: nowrap;
+  inset: 0;
   overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.hi-brand__mark {
-  flex: none;
-  color: var(--text-primary);
-}
-
-.hi-sidebar[data-collapsed="true"] .hi-brand {
-  justify-content: center;
-  padding: 18px 8px 10px;
-}
-
-.hi-nav {
-  flex: 1;
-  min-height: 0;
-  padding: 10px 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  overflow-y: auto;
-}
-
-.hi-nav__group {
-  padding: 10px;
-  margin-top: 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.hi-nav__item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-height: 42px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  font-size: 16px;
-  font-weight: 520;
-  white-space: nowrap;
-  min-width: 0;
-  color: var(--text-secondary);
-  border: 0;
-  background: transparent;
-  cursor: pointer;
+  background: var(--bg);
+  transform-origin: 50% 100%;
   transition:
-    background var(--m-control) var(--ease-arrive),
-    color var(--m-control) var(--ease-arrive);
+    transform var(--dur-sheet) var(--ease-sheet),
+    border-radius var(--dur-sheet) var(--ease-sheet),
+    opacity var(--dur-sheet) var(--ease-sheet);
 }
 
-.hi-nav__item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
+/* A full sheet steps the screen behind it back, the way iOS presents a page. */
+.hi-app[data-behind="true"] {
+  transform: translateY(calc(var(--safe-top) - 18px)) scale(0.93);
+  border-radius: var(--r-sheet);
+  opacity: 0.82;
 }
 
-.hi-nav__item:hover .hi-nav__icon {
-  color: var(--text-primary);
+.hi-view {
+  position: absolute;
+  inset: 0;
 }
 
-/* Selection is one signal: a tonal fill. */
-.hi-nav__item[data-active="true"] {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-  font-weight: 560;
+.hi-scroll {
+  position: absolute;
+  inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding: calc(var(--safe-top) + 52px) var(--margin) calc(var(--chrome-bottom) + 28px);
 }
 
-.hi-nav__icon {
-  flex: none;
-  color: var(--text-tertiary);
+.hi-scroll::-webkit-scrollbar {
+  display: none;
 }
 
-.hi-nav__label {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.hi-nav__group .hi-nav__item {
-  min-height: 38px;
-  font-size: 15px;
-  color: var(--text-tertiary);
-}
-
-.hi-sidebar[data-collapsed="true"] .hi-nav__item {
-  justify-content: center;
-  padding: 0;
+.hi-app[data-live="true"] .hi-scroll {
+  padding-bottom: calc(var(--chrome-bottom) + 94px);
 }
 
 .hi-topbar {
-  height: var(--topbar-h);
-  position: sticky;
+  position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 20;
+  height: calc(var(--safe-top) + 52px);
+  padding: var(--safe-top) 16px 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.hi-topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.6);
+  backdrop-filter: blur(22px) saturate(1.6);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  opacity: 0;
+  transition: opacity var(--dur-fade) ease;
+}
+
+.hi-view[data-scrolled="true"] .hi-topbar::before {
+  opacity: 1;
+}
+
+.hi-topbar > * {
+  pointer-events: auto;
+}
+
+.hi-topbar__lead {
+  justify-self: start;
+  display: flex;
+  gap: 8px;
+}
+
+.hi-topbar__trail {
+  justify-self: end;
+  display: flex;
+  gap: 8px;
+}
+
+.hi-topbar__title {
+  font-size: var(--t-body);
+  font-weight: 650;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity var(--dur-fade) ease,
+    transform var(--dur-fade) var(--ease-out);
+  white-space: nowrap;
+}
+
+.hi-view[data-scrolled="true"] .hi-topbar__title {
+  opacity: 1;
+  transform: none;
+}
+
+.hi-pagehead {
+  padding: 2px 4px 22px;
+}
+
+.hi-pagehead h1 {
+  font-family: var(--font-display);
+  font-size: var(--t-large);
+  line-height: 1.18;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+}
+
+.hi-pagehead p {
+  margin-top: 6px;
+  color: var(--text-2);
+}
+
+.hi-tabbar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: var(--tabbar-bottom);
+  z-index: 30;
+  height: var(--tabbar-h);
+  padding: 5px;
+  display: flex;
+  gap: 2px;
+  border-radius: var(--r-full);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    var(--glass-shadow);
+}
+
+.hi-tab {
+  flex: 1;
+  min-width: 0;
+  border-radius: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  color: var(--text-2);
+  font-size: min(var(--t-label), 17px);
+  line-height: 1.15;
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fade) ease,
+    color var(--dur-fade) ease,
+    transform var(--dur-press) var(--ease-out);
+}
+
+.hi-tab:active {
+  transform: scale(0.95);
+}
+
+.hi-tab[aria-current="page"] {
+  color: var(--text-1);
+  font-weight: 650;
+}
+
+/* The current tab's ground, one piece that glides to whichever tab is chosen. */
+.hi-tabbar__pill {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc((100% - 16px) / 4);
+  border-radius: 28px;
+  background: var(--control);
+  transform: translateX(calc(var(--tab) * (100% + 2px)));
+  transition: transform var(--dur-spring) var(--spring);
+}
+
+.hi-tab {
+  position: relative;
+}
+
+.hi-livebar {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: calc(var(--chrome-bottom) + 10px);
+  z-index: 29;
+  height: 58px;
+  padding: 0 7px 0 18px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 clamp(16px, 2vw, 24px);
-  min-width: 0;
+  border-radius: 29px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    var(--glass-shadow);
+  animation: hi-rise var(--dur-reach) var(--ease-out);
 }
 
-.hi-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.hi-breadcrumb__current {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 16px;
-  font-weight: 560;
-  color: var(--text-primary);
-}
-
-.hi-topbar__utility {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* The live word: what the microphone is doing, visible on every screen. */
-.hi-live {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 36px;
-  padding: 0 12px;
-  border-radius: var(--radius-sm);
-  text-decoration: none;
-  font-size: 15px;
-  font-weight: 560;
-  color: var(--text-primary);
-  background: var(--accent-tint);
-  white-space: nowrap;
-}
-
-.hi-live:hover {
-  background: var(--bg-hover);
-}
-
-.hi-shell__body {
-  display: flex;
-  flex-direction: column;
-}
-
-.hi-main {
+.hi-livebar__open {
   flex: 1;
   min-width: 0;
-  width: 100%;
-  padding: 28px clamp(20px, 3.4vw, 64px) 96px;
-  outline: none;
-  position: relative;
-  z-index: 1;
-}
-
-@media (max-width: 720px) {
-  .hi-main {
-    padding: 20px 16px 48px;
-  }
-}
-
-/* Top-bar search: a button; the palette owns the field. */
-.hi-topsearch {
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 36px;
-  width: clamp(180px, 26vw, 320px);
-  padding: 0 10px 0 14px;
-  border: 0;
-  border-radius: 9px;
-  background: var(--bg-surface2);
-  box-shadow: inset 0 0 0 1px var(--border-hairline);
-  color: var(--text-tertiary);
-  font: inherit;
-  font-size: 15px;
-  cursor: pointer;
-  transition:
-    color var(--m-control) var(--ease-arrive),
-    box-shadow var(--m-control) var(--ease-arrive);
-}
-
-.hi-topsearch:hover {
-  color: var(--text-secondary);
-  box-shadow: inset 0 0 0 1px var(--border-strong);
-}
-
-.hi-topsearch__label {
-  flex: 1;
+  gap: 12px;
+  align-self: stretch;
   text-align: left;
 }
 
-.hi-topsearch__kbd {
-  flex: none;
-  font: inherit;
-  font-size: 14px;
-  letter-spacing: 0.01em;
-  color: var(--text-tertiary);
+.hi-livebar__word {
+  font-weight: 650;
 }
 
-@media (max-width: 900px) {
-  .hi-topsearch__kbd {
-    display: none;
-  }
+.hi-livebar__time {
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
 }
 
-@media (max-width: 640px) {
-  .hi-topsearch {
-    width: 36px;
-    padding: 0;
-    justify-content: center;
-  }
-  .hi-topsearch__label {
-    display: none;
-  }
-}
-
-/* Below 1024 the sidebar leaves the flow and becomes a drawer. */
-@media (max-width: 1023px) {
-  .hi-sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 40;
-    width: min(300px, 84vw);
-    transform: translate3d(-100%, 0, 0);
-    transition:
-      transform var(--m-surface) var(--ease-arrive),
-      visibility var(--m-surface) step-end;
-    visibility: hidden;
-    box-shadow: var(--e2);
-  }
-  .hi-sidebar[data-open="true"] {
-    transform: translate3d(0, 0, 0);
-    visibility: visible;
-    transition:
-      transform var(--m-surface) var(--ease-arrive),
-      visibility 0s;
-  }
-  .hi-sidebar[data-collapsed="true"] {
-    width: min(300px, 84vw);
-  }
-  .hi-drawer-scrim {
-    position: fixed;
-    inset: 0;
-    z-index: 39;
-    background: var(--scrim);
+@keyframes hi-rise {
+  from {
     opacity: 0;
-    pointer-events: none;
-    transition: opacity var(--m-surface) var(--ease-arrive);
-  }
-  .hi-drawer-scrim[data-open="true"] {
-    opacity: 1;
-    pointer-events: auto;
-  }
-  .hi-topbar__menu {
-    flex: none;
-    margin-right: 2px;
+    transform: translateY(26px) scale(0.96);
   }
 }
 
-@media (min-width: 1024px) {
-  .hi-drawer-scrim,
-  .hi-topbar__menu {
-    display: none;
-  }
+.hi-overlays {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .hi-sidebar,
-  .hi-drawer-scrim {
-    transition: none;
-  }
+.hi-scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  opacity: 0;
+  pointer-events: auto;
+  transition: opacity var(--dur-sheet) var(--ease-sheet);
 }
 
-:root[data-motion="reduced"] .hi-sidebar,
-:root[data-motion="reduced"] .hi-drawer-scrim {
+.hi-scrim[data-open="true"] {
+  opacity: 1;
+}
+
+.hi-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: calc(100% - var(--safe-top) - 10px);
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--r-sheet) var(--r-sheet) 0 0;
+  background: var(--sheet-bg);
+  box-shadow: var(--sheet-shadow);
+  pointer-events: auto;
+  transform: translateY(104%);
+  transition: transform var(--dur-sheet) var(--ease-sheet);
+  outline: none;
+}
+
+.hi-sheet[data-open="true"] {
+  transform: translateY(var(--drag, 0px));
+}
+
+.hi-sheet[data-dragging="true"] {
   transition: none;
 }
 
-/* Focus never scrolls under the sticky bar (WCAG 2.4.11). */
-.hi-app :is(a, button, summary, input, select, textarea, [tabindex]:not([tabindex="-1"])) {
-  scroll-margin-top: calc(var(--topbar-h) + 16px);
+.hi-sheet[data-size="full"] {
+  top: calc(var(--safe-top) + 10px);
+  max-height: none;
 }
 
-@media (pointer: coarse) {
-  .hi-nav__item {
-    min-height: 44px;
+.hi-sheet__grip {
+  flex: none;
+  padding: 8px 0 2px;
+  touch-action: none;
+  cursor: grab;
+}
+
+.hi-sheet__grip::before {
+  content: "";
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: 0 auto;
+  border-radius: 3px;
+  background: var(--text-3);
+  opacity: 0.45;
+}
+
+.hi-sheet__head {
+  flex: none;
+  display: grid;
+  grid-template-columns: 48px 1fr 48px;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 16px 12px;
+  touch-action: none;
+}
+
+.hi-sheet__title {
+  text-align: center;
+  font-size: var(--t-title2);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hi-sheet__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  padding: 8px var(--margin) calc(var(--safe-bottom) + 20px);
+}
+
+.hi-sheet__body:has(+ .hi-sheet__foot) {
+  padding-bottom: 12px;
+}
+
+.hi-sheet__body::-webkit-scrollbar {
+  display: none;
+}
+
+.hi-sheet__foot {
+  flex: none;
+  display: grid;
+  gap: 10px;
+  padding: 12px var(--margin) calc(var(--safe-bottom) + 14px);
+}
+
+/* Toasts drop in just under the status bar, over any corner buttons there. */
+.hi-toasts {
+  position: absolute;
+  top: var(--safe-top);
+  left: 16px;
+  right: 16px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.hi-toast {
+  min-height: 56px;
+  padding: 4px 4px 4px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  border-radius: 22px;
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(22px) saturate(1.7);
+  backdrop-filter: blur(22px) saturate(1.7);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    var(--glass-shadow);
+  pointer-events: auto;
+  animation: hi-drop var(--dur-reach) var(--ease-out);
+}
+
+.hi-toast[data-leaving] {
+  animation: hi-lift 200ms var(--ease-out) forwards;
+}
+
+.hi-toast__text {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.hi-toast .hi-btn {
+  border-radius: 18px;
+}
+
+@keyframes hi-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+}
+
+@keyframes hi-lift {
+  to {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+}
+
+.hi-firstrun {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+html[data-onboarded="1"] .hi-firstrun[data-pending="true"] {
+  display: none;
+}
+
+/*
+  Page transitions (shell/transitions.ts). Only what a kind of transition moves
+  is named while it runs. Taps pass through to the new page, so switching tabs
+  quickly is never held up.
+*/
+::view-transition {
+  pointer-events: none;
+}
+
+html[data-nav="forward"] {
+  --nav-in: 36px;
+  --nav-out: -18px;
+  --rise: 24px;
+}
+
+html[data-nav="back"] {
+  --nav-in: -36px;
+  --nav-out: 18px;
+  --rise: -24px;
+}
+
+/* Tabs: the page slides the way the tabs lie; the tab bar stays put while its pill glides. */
+html[data-vt="tabs"] .hi-view {
+  view-transition-name: page;
+}
+
+html[data-vt="tabs"] .hi-tabbar {
+  view-transition-name: tabbar;
+}
+
+html[data-vt="tabs"]::view-transition-old(tabbar) {
+  display: none;
+}
+
+html[data-vt="tabs"]::view-transition-new(tabbar) {
+  animation: none;
+}
+
+/* The old page is gone before the new one is more than a shade, so the two never stack up. */
+html[data-vt="tabs"]::view-transition-old(page) {
+  animation: hi-page-out 110ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+html[data-vt="tabs"]::view-transition-new(page) {
+  animation: hi-page-in var(--dur-spring) var(--spring) 60ms both;
+}
+
+@keyframes hi-page-out {
+  to {
+    opacity: 0;
+    transform: translateX(var(--nav-out));
+  }
+}
+
+@keyframes hi-page-in {
+  from {
+    opacity: 0;
+    transform: translateX(var(--nav-in));
+  }
+}
+
+/* First-run steps: the picture reshapes into the next step's, and the words rise in after it. */
+html[data-vt="steps"] .hi-fr {
+  view-transition-name: fr-step;
+}
+
+html[data-vt="steps"] .hi-fr__card {
+  view-transition-name: fr-card;
+}
+
+html[data-vt="steps"]::view-transition-old(fr-step) {
+  animation: hi-words-out 120ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+html[data-vt="steps"]::view-transition-new(fr-step) {
+  animation: hi-words-in var(--dur-spring) var(--spring) 120ms both;
+}
+
+html[data-vt="steps"]::view-transition-group(fr-card) {
+  overflow: clip;
+  border-radius: var(--r-hero);
+  animation-duration: var(--dur-spring);
+  animation-timing-function: var(--spring);
+}
+
+/* The next picture takes the card at once and the card reshapes around it; two pictures never show together. */
+html[data-vt="steps"]::view-transition-old(fr-card) {
+  display: none;
+}
+
+html[data-vt="steps"]::view-transition-new(fr-card) {
+  height: 100%;
+  object-fit: cover;
+  animation: none;
+}
+
+/* Leaving the first run, the picture goes with the words and the app shows through. */
+html[data-vt="steps"]::view-transition-old(fr-card):only-child {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  animation: hi-words-out 200ms cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+@keyframes hi-words-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--rise) * -0.4));
+  }
+}
+
+@keyframes hi-words-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--rise));
   }
 }

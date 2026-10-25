@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { clarityDb } from "@/core/clarity";
-import { HEARING_LABEL, initials, newListener, seatAngles } from "@/core/listeners";
+import { HEARING_LABEL, initials, newListener } from "@/core/listeners";
 import {
   inReach,
   levelAtDistance,
@@ -55,9 +55,9 @@ describe("reach model", () => {
   it("decides which seats are in reach for their own class", () => {
     const reach = reachAll(62, 50);
     const seats = [
-      newListener("a", "Ana", "well", 1.0),
-      newListener("b", "Jane", "some", 2.0),
-      newListener("c", "Tom", "well", 2.0),
+      newListener("a", "Ana", "well", "L1"),
+      newListener("b", "Jane", "some", "L3"),
+      newListener("c", "Tom", "well", "R3"),
     ];
     expect(inReach(seats, reach)).toEqual(["a"]);
     expect(inReach(seats, reachAll(66, 50))).toEqual(["a", "c"]);
@@ -74,16 +74,14 @@ describe("reach model", () => {
 });
 
 describe("listeners", () => {
-  it("spreads seats across the far side of the table", () => {
-    expect(seatAngles(1)).toEqual([0]);
-    expect(seatAngles(3)).toEqual([-50, 0, 50]);
-    expect(seatAngles(6)).toEqual([-70, -42, -14, 14, 42, 70]);
-  });
-
   it("makes initials and trims labels", () => {
-    expect(initials("Jane")).toBe("JA");
+    expect(initials("Jane")).toBe("J");
+    expect(initials("grandpa Joe")).toBe("GJ");
     expect(initials("Mary Ann Smith")).toBe("MS");
-    expect(newListener("x", "  A very long name indeed  ", "well", 1).label).toBe("A very long na");
+    expect(initials("   ")).toBe("?");
+    expect(newListener("x", "  A very long name indeed  ", "well", "L1").label).toBe(
+      "A very long na",
+    );
     expect(HEARING_LABEL.alot).toContain("Hearing aids");
   });
 });

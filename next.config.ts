@@ -29,6 +29,8 @@ const config = (phase: string): NextConfig => {
   return {
     poweredByHeader: false,
     reactStrictMode: true,
+    // A lockfile in a parent folder would otherwise be taken for the workspace root.
+    outputFileTracingRoot: process.cwd(),
     env: { NEXT_PUBLIC_BABBLE_FILES: babbleFiles.join(",") },
     async headers() {
       return [

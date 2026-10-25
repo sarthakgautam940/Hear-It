@@ -2,9 +2,17 @@
 
 const sw = self as unknown as ServiceWorkerGlobalScope;
 
-const CACHE = "hearit-shell-v1";
-const PAGES = ["/", "/people", "/room", "/self-test", "/report", "/settings", "/science"];
-const ASSETS = ["/manifest.webmanifest", "/audio/level-processor.js", "/icons/icon.svg"];
+/* A new name retires older caches, which held pages and fonts this app no longer uses. */
+const CACHE = "hearit-shell-v3";
+const PAGES = ["/", "/people", "/history", "/settings"];
+const ASSETS = [
+  "/manifest.webmanifest",
+  "/audio/level-processor.js",
+  "/fonts/InterVariable.woff2",
+  "/fonts/SourceSerif4-Variable.woff2",
+  "/icons/favicon.svg",
+  "/icons/icon-192.png",
+];
 
 sw.addEventListener("install", (event) => {
   event.waitUntil(
@@ -39,12 +47,12 @@ sw.addEventListener("fetch", (event) => {
     return;
   }
   if (
-    url.hostname.endsWith("fontshare.com") ||
-    (url.origin === sw.location.origin &&
-      (url.pathname.startsWith("/audio/") ||
-        url.pathname.startsWith("/babble/") ||
-        url.pathname.startsWith("/icons/") ||
-        url.pathname === "/manifest.webmanifest"))
+    url.origin === sw.location.origin &&
+    (url.pathname.startsWith("/audio/") ||
+      url.pathname.startsWith("/babble/") ||
+      url.pathname.startsWith("/fonts/") ||
+      url.pathname.startsWith("/icons/") ||
+      url.pathname === "/manifest.webmanifest")
   ) {
     event.respondWith(staleWhileRevalidate(request));
   }

@@ -81,6 +81,8 @@ export interface EngineSnapshot {
   babbleSource: BabbleSource | null;
   caps: Capabilities | null;
   roomProgress: number | null;
+  /** When the current table session began, in epoch milliseconds. */
+  liveSince: number | null;
 }
 
 export interface UtteranceEvent {
@@ -125,6 +127,7 @@ const INITIAL: EngineSnapshot = {
   babbleSource: null,
   caps: null,
   roomProgress: null,
+  liveSince: null,
 };
 
 interface OpenUtterance {
@@ -280,6 +283,7 @@ class Engine {
         chatterSeconds: 0,
         dosePercent: 0,
         roomProgress: null,
+        liveSince: mode === "table" ? Date.now() : null,
       },
       true,
     );

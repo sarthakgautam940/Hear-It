@@ -74,6 +74,23 @@ export async function openMicrophone(): Promise<Microphone> {
   return { stream, ctx, caps };
 }
 
+/** Asks for the microphone once and lets it go, so the first conversation never opens on a prompt. */
+export async function requestMicrophoneAccess(): Promise<void> {
+  if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
+    throw new MicrophoneError(
+      "unsupported",
+      "This browser cannot open the microphone from a web page.",
+    );
+  }
+  let stream: MediaStream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+  } catch (err) {
+    throw MicrophoneError.fromGetUserMedia(err);
+  }
+  for (const track of stream.getTracks()) track.stop();
+}
+
 export type MicrophoneFailure = "denied" | "busy" | "unsupported" | "unknown";
 
 export class MicrophoneError extends Error {

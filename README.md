@@ -2,7 +2,7 @@
 
 Hear It makes a quiet voice carry across the table and shows how far it reaches, so people with Parkinson's or an aging voice are heard.
 
-It is a progressive web app for the phone you already own and one earbud. While you speak, and only while you speak, it plays soft six-talker chatter into that ear. The Lombard reflex, described in 1911, raises your voice without you trying. A controller finds the least chatter that keeps you at your target, down to none. A live map turns your measured voice level and the room's measured noise into meters, and shows which seats at the table can hear you. Nothing is recorded and nothing leaves the phone.
+It is a progressive web app for the phone you already own and one earbud. While you speak, and only while you speak, it plays soft six-talker chatter into that ear. The Lombard reflex, described in 1911, raises your voice without you trying. A controller finds the least chatter that keeps you at your target, down to none. A drawing of your table, seen from above, turns your measured voice level and the room's measured noise into meters: the cloth lights up as far as your voice carries, and each seat shows whether that person can hear you. Nothing is recorded and nothing leaves the phone.
 
 Built by [Name] and [Name] of Deep Run High School, Glen Allen, Virginia, for the 2026 Congressional App Challenge in Virginia's First District.
 
@@ -12,11 +12,17 @@ Built by [Name] and [Name] of Deep Run High School, Glen Allen, Virginia, for th
 
 It needs HTTPS, a microphone, and one earbud; wired earbuds with an inline microphone are the tested setup. Tested devices and browser versions are listed before submission: [Android phone, Chrome version] and [iPhone, iOS version]. The iOS caveats are under Limitations.
 
+On a desktop the app runs inside a drawn iPhone at its real size, so a judge sees it as the phone shows it; on a phone the frame disappears, the app fills the screen and installs to the home screen.
+
 ## Who it is for
 
 - People whose voice has grown quiet from Parkinson's. About 1.1 million Americans live with Parkinson's; 89% have a speech or voice disorder and 3 to 4% receive speech treatment ([Trail 2005](https://pubmed.ncbi.nlm.nih.gov/16340101/)).
 - People with an aging voice: 29% of independent older adults report a current voice disorder ([Roy 2007](https://pubmed.ncbi.nlm.nih.gov/17429872/)).
 - The people across the table from them, who often have hearing loss of their own: 55% of adults 75 and over have disabling hearing loss, and fewer than 30% of adults 70 and over who could benefit have used a hearing aid ([NIDCD](https://www.nidcd.nih.gov/health/statistics/quick-statistics-hearing)). A hearing aid raises the noise with the speech. The only place signal-to-noise is made is at the talker, and that is where this app works.
+
+## The app
+
+Four tabs and a two-minute first run. Talk is the table: you at the near end, the people you talk with along the sides at their own distance from you, the cloth lit by your voice as far as it carries, and a place mat that turns marigold when that person can hear you, with the word beside it. One button starts and stops. People seats the family and records how each one hears, in their own words. History keeps each conversation with the share of sentences that reached everyone. Settings holds the voice check, the chatter controls, the look, calibration against a sound meter, and the science behind it all. The main screens carry status, never instructions: the first run explains the idea once, and the table faces the family rather than the talker, because watching a loudness readout is the one condition under which speakers suppress the reflex.
 
 ## Run and test
 
@@ -97,9 +103,13 @@ Parts B to F follow in the same format once measured. Caveats that print with th
 ```
 src/core        pure TypeScript, no browser APIs, fully tested: dsp (level, A-weighting, biquads, pitch, modulation, babble synthesis, loop), vad, gate, controller, exposure, selftest, session, reach, listeners, room, clarity
 src/platform    the microphone and audio graph, the AudioWorklet processor, babble loading, the engine, storage, wake lock, service worker
-src/components  the shell (navigation, command palette), reusable controls, the reach canvas, and one component per screen
-src/app         Next.js routes: /, /people, /room, /self-test, /report, /settings, /science
-src/styles      design tokens and plain CSS, paper and night themes, high contrast and color-vision palettes, text size
+src/features    one folder per tab or sheet: talk (the table, its layout and the headline copy), people, history, voicecheck, settings, about, firstrun
+src/shell       the app shell: tab bar, live bar, screen scaffold, overlays, and the stop-then-report helper
+src/ui          the component library: buttons, sheet, toast, controls, structure
+src/brand       the logo as path data, and two small pictures for an empty History and the voice check
+src/device      the drawn iPhone the app runs inside on a desktop
+src/app         Next.js routes: /, /people, /history, /settings
+src/styles      design tokens and plain CSS: light and dark themes, text size, the device frame, the shell, components, features
 tests/core      Vitest suites with reference values from the standards and papers above
 validation      the protocol, the raw data sheet and the analysis script
 scripts         bundles the worklet and service worker with esbuild; the Next config runs it whenever a build or the dev server starts with the bundles out of date
@@ -121,7 +131,7 @@ scripts         bundles the worklet and service worker with esbuild; the Next co
 
 No audio library is used: the metering, detection, gating, control, synthesis and reach code is in `src/core` and `src/platform`. No machine-learning model and no network service is used.
 
-The typeface is General Sans by Indian Type Foundry, loaded at runtime from the Fontshare API. Fontshare's license allows free use in products but does not permit redistributing the font files, so none are committed to this repository; if the API is unreachable the interface falls back to the system sans-serif.
+Two typefaces ship in `public/fonts` with their licenses, both under the SIL Open Font License 1.1, so the app renders the same offline: Inter by Rasmus Andersson for everything you read and tap, with its alternate l and I so that I, l and 1 stay distinct, and Source Serif 4 by Adobe for headlines and the large numbers. The logo comes from Atkinson Hyperlegible Next by the Braille Institute (also under the OFL): the mark is its ExtraBold h with a voice dot over the leg, and the wordmark is lowercase "hear it" at Bold.
 
 ## AI disclosure
 
@@ -129,7 +139,7 @@ This project was built with an AI coding assistant (Claude by Anthropic) working
 
 ## Privacy
 
-No sound is recorded or sent anywhere. The microphone feeds a level meter fifty times a second and the samples are discarded. The people at your table, the room measurement, your self-test and your reports are kept in your browser's local storage on this phone and can be cleared in Settings. There are no accounts, no analytics and no network requests after the page loads, apart from the font. The service worker caches the app's own files so it opens offline.
+No sound is recorded or sent anywhere. The microphone feeds a level meter fifty times a second and the samples are discarded. The people at your table, the room measurement, your self-test and your reports are kept in your browser's local storage on this phone and can be cleared in Settings. There are no accounts, no analytics and no network requests after the page loads. The service worker caches the app's own files so it opens offline.
 
 ## Limitations
 
@@ -148,6 +158,6 @@ No sound is recorded or sent anywhere. The microphone feeds a level meter fifty 
 
 [Name], [Name]: Deep Run High School, Glen Allen, Virginia. Entry for the 2026 Congressional App Challenge, Virginia's First District.
 
-The interface design system, typography and shell patterns were adapted from the team's own earlier project. The six-talker chatter, when a recording is present, is the team's own.
+The brand, the interface and the drawn phone are the team's own. The six-talker chatter, when a recording is present, is the team's own.
 
 MIT License; see [LICENSE](LICENSE).

@@ -1,9 +1,11 @@
 import { isHearing } from "@/core/listeners";
 import { DEFAULT_ALPHA_DB_PER_DOUBLING } from "@/core/reach";
+import { isSeatSlot, seatDistanceM, seatEveryone, type SeatSlot } from "@/core/seats";
 import type {
   Calibration,
   ChatterLevel,
   EarMode,
+  Hearing,
   Listener,
   Room,
   SelfTestResult,
@@ -121,9 +123,16 @@ export const calibrationStore = createStore<Calibration>(
   },
 );
 
+/* People saved before chairs existed keep their distance and take the free chair nearest it. */
 export const listenersStore = createStore<Listener[]>("listeners", [], (raw) => {
   if (!Array.isArray(raw)) return null;
-  const out: Listener[] = [];
+  const read: {
+    id: string;
+    label: string;
+    hearing: Hearing;
+    distanceM: number;
+    seat?: SeatSlot;
+  }[] = [];
   for (const item of raw) {
     if (
       !isRecord(item) ||
@@ -134,9 +143,15 @@ export const listenersStore = createStore<Listener[]>("listeners", [], (raw) => 
     ) {
       continue;
     }
-    out.push({ id: item.id, label: item.label, hearing: item.hearing, distanceM: item.distanceM });
+    read.push({
+      id: item.id,
+      label: item.label,
+      hearing: item.hearing,
+      distanceM: item.distanceM,
+      ...(isSeatSlot(item.seat) ? { seat: item.seat } : {}),
+    });
   }
-  return out;
+  return seatEveryone(read).map((p) => ({ ...p, distanceM: seatDistanceM(p.seat) }));
 });
 
 export const DEFAULT_ROOM: Room = {

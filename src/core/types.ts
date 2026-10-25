@@ -1,3 +1,5 @@
+import type { SeatSlot } from "./seats";
+
 /** How a listener hears in noise, in their own words. Never a diagnosis. */
 export type Hearing = "well" | "some" | "alot";
 
@@ -48,6 +50,8 @@ export interface Listener {
   id: string;
   label: string;
   hearing: Hearing;
+  /** The chair they sit in; their distance from you follows from it. */
+  seat: SeatSlot;
   distanceM: number;
 }
 

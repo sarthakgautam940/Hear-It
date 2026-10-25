@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { fmtDuration, fmtMeters, fmtPercent, fmtSignedDb, listNames } from "@/lib/format";
+import {
+  fmtDuration,
+  fmtMeters,
+  fmtMetersShort,
+  fmtPercent,
+  fmtSignedDb,
+  listNames,
+} from "@/lib/format";
 
 describe("format", () => {
   it("signs a decibel change after rounding, so nothing reads as minus zero", () => {
@@ -14,6 +21,15 @@ describe("format", () => {
     expect(fmtMeters(0.3)).toBe("under half a meter");
     expect(fmtMeters(6)).toBe("across the room");
     expect(fmtMeters(1.74)).toBe("about 1.7 m");
+  });
+
+  it("leaves whole meters whole", () => {
+    expect(fmtMetersShort(1)).toBe("1 m");
+    expect(fmtMetersShort(1.5)).toBe("1.5 m");
+    expect(fmtMetersShort(2.96)).toBe("3 m");
+    expect(fmtMetersShort(0.3)).toBe("under 0.5 m");
+    expect(fmtMetersShort(6)).toBe("over 6 m");
+    expect(fmtMeters(2.04)).toBe("about 2 m");
   });
 
   it("lists names the way people say them", () => {

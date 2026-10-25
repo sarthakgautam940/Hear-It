@@ -1,0 +1,891 @@
+.hi-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: var(--tap);
+  padding: 0 20px;
+  border-radius: var(--r-full);
+  font-size: var(--t-body);
+  font-weight: 650;
+  line-height: 1.2;
+  white-space: nowrap;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    transform var(--dur-press) var(--ease-out),
+    background-color var(--dur-fade) ease,
+    opacity var(--dur-fade) ease;
+}
+
+.hi-btn:active {
+  transform: scale(0.97);
+}
+
+.hi-btn[data-size="large"] {
+  min-height: var(--tap-primary);
+  padding: 0 26px;
+  font-size: 1.059rem;
+}
+
+.hi-btn[data-block="true"] {
+  display: flex;
+  width: 100%;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  white-space: normal;
+  text-align: center;
+}
+
+.hi-btn--primary {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.hi-btn--primary:active {
+  background: var(--ink-press);
+}
+
+/* On the table's light stage the action stays black in both themes. */
+.hi-btn--stage {
+  background: var(--table-ink);
+  color: #fff;
+}
+
+.hi-btn--stage:active {
+  background: #2c2c2c;
+}
+
+.hi-btn--secondary {
+  background: var(--control);
+  color: var(--text-1);
+}
+
+.hi-btn--secondary:active {
+  background: var(--control-press);
+}
+
+.hi-btn--plain {
+  background: transparent;
+  color: var(--text-1);
+  padding: 0 12px;
+}
+
+.hi-btn--plain[data-tone="danger"] {
+  color: var(--danger);
+}
+
+.hi-btn--danger {
+  background: var(--danger-wash);
+  color: var(--danger);
+}
+
+.hi-btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+.hi-spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2.5px solid currentColor;
+  border-right-color: transparent;
+  animation: hi-spin 0.8s linear infinite;
+}
+
+@keyframes hi-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Glass: only for controls that float over content. */
+.hi-gbtn,
+.hi-gcap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--tap);
+  border-radius: var(--r-full);
+  background: var(--glass);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    var(--glass-shadow);
+  color: var(--text-1);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.hi-gbtn {
+  width: var(--tap);
+}
+
+.hi-gcap {
+  gap: 8px;
+  padding: 0 16px 0 12px;
+  font-size: var(--t-subhead);
+  font-weight: 650;
+}
+
+.hi-gbtn:active,
+.hi-gcap:active {
+  transform: scale(0.94);
+}
+
+.hi-gbtn:disabled {
+  opacity: 0.45;
+}
+
+.hi-gcap__value {
+  color: var(--text-2);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.hi-ibtn {
+  display: grid;
+  place-items: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  background: var(--control);
+  color: var(--text-1);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.hi-ibtn:active {
+  transform: scale(0.94);
+}
+
+.hi-card {
+  background: var(--surface);
+  border-radius: var(--r-card);
+  padding: 20px;
+  box-shadow:
+    var(--card-shadow),
+    inset 0 0 0 1px var(--hairline);
+}
+
+.hi-sheet .hi-card,
+.hi-sheet .hi-group,
+.hi-sheet .hi-stat {
+  background: var(--sheet-card);
+}
+
+.hi-section {
+  margin-top: 32px;
+}
+
+.hi-section:first-child {
+  margin-top: 0;
+}
+
+.hi-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 4px 12px;
+}
+
+.hi-section__title {
+  font-size: var(--t-title3);
+  line-height: 1.25;
+  font-weight: 650;
+  letter-spacing: -0.008em;
+}
+
+.hi-section__note {
+  margin: 10px 4px 0;
+  font-size: var(--t-subhead);
+  line-height: 1.4;
+  color: var(--text-2);
+}
+
+.hi-group {
+  display: grid;
+  gap: 2px;
+  padding: 6px;
+  border-radius: var(--r-card);
+  background: var(--surface);
+  box-shadow:
+    var(--card-shadow),
+    inset 0 0 0 1px var(--hairline);
+}
+
+.hi-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: var(--row);
+  padding: 10px 12px;
+  border-radius: 22px;
+  text-align: left;
+  transition: background-color var(--dur-fade) ease;
+}
+
+button.hi-row:active,
+a.hi-row:active {
+  background: var(--control);
+}
+
+.hi-row__icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  background: var(--control);
+  color: var(--text-1);
+}
+
+.hi-row__body {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.hi-row__title {
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.hi-row__sub {
+  font-size: var(--t-subhead);
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
+.hi-row__trail {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-3);
+}
+
+.hi-row[data-tone="danger"] .hi-row__title,
+.hi-row[data-tone="danger"] .hi-row__icon {
+  color: var(--danger);
+}
+
+.hi-row[data-tone="danger"] .hi-row__icon {
+  background: var(--danger-wash);
+}
+
+/* Rows that slide left under the finger to show their actions. */
+.hi-swipe {
+  --swipe-r: 22px;
+  position: relative;
+  overflow-x: clip;
+}
+
+.hi-swipe__content {
+  position: relative;
+  touch-action: pan-y;
+}
+
+.hi-swipe[data-dragging] .hi-swipe__content {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* A row being dragged is held, not pressed. */
+.hi-swipe[data-dragging] .hi-row:active {
+  background: transparent;
+}
+
+.hi-swipe__actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  display: flex;
+  gap: 6px;
+  padding-left: 6px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.hi-swipe__action {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  overflow: hidden;
+  border-radius: var(--swipe-r);
+  background: var(--control);
+  color: var(--text-1);
+  font-size: var(--t-label);
+  font-weight: 650;
+  white-space: nowrap;
+  transition:
+    flex-grow 220ms var(--ease-out),
+    margin 220ms var(--ease-out),
+    opacity 160ms ease;
+}
+
+.hi-swipe__action > * {
+  opacity: var(--reveal, 1);
+  transform: scale(calc(0.86 + 0.14 * var(--reveal, 1)));
+}
+
+.hi-swipe__action[data-tone="danger"] {
+  background: var(--danger-fill);
+  color: #fff;
+}
+
+/* Far enough to go through: the red takes the row, its words riding along the row's edge. */
+.hi-swipe__actions[data-armed="true"] .hi-swipe__action:not([data-tone="danger"]) {
+  flex-grow: 0;
+  margin-right: -6px;
+  opacity: 0;
+}
+
+.hi-swipe__actions[data-armed="true"] .hi-swipe__action[data-tone="danger"] {
+  align-items: flex-start;
+  padding-left: 22px;
+}
+
+/* A short question over everything, such as the undo a shake brings up. */
+.hi-alert {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: auto;
+}
+
+.hi-alert__scrim {
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+  animation: hi-alert-fade var(--dur-fade) ease;
+}
+
+.hi-alert__box {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  display: grid;
+  gap: 8px;
+  padding: 26px 20px 20px;
+  border-radius: 28px;
+  background: var(--surface);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
+  text-align: center;
+  animation: hi-alert-in 280ms var(--ease-out);
+}
+
+.hi-alert__title {
+  font-family: var(--font-display);
+  font-size: var(--t-title2);
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.hi-alert__text {
+  color: var(--text-2);
+  text-wrap: balance;
+}
+
+.hi-alert__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+@keyframes hi-alert-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes hi-alert-in {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+
+.hi-control {
+  display: grid;
+  gap: 12px;
+  padding: 14px 12px 12px;
+}
+
+.hi-control__head {
+  display: grid;
+  gap: 2px;
+}
+
+.hi-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--r-field);
+  background: var(--control);
+}
+
+.hi-sheet .hi-seg {
+  background: var(--sheet-card);
+}
+
+.hi-seg__opt {
+  flex: 1 1 auto;
+  min-width: 22%;
+  min-height: 48px;
+  padding: 0 10px;
+  border-radius: 12px;
+  color: var(--text-2);
+  font-weight: 600;
+  white-space: nowrap;
+  transition:
+    background-color var(--dur-fade) ease,
+    color var(--dur-fade) ease,
+    box-shadow var(--dur-fade) ease;
+}
+
+.hi-seg__opt[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.hi-seg__opt:disabled {
+  opacity: 0.5;
+}
+
+.hi-switch {
+  position: relative;
+  flex: none;
+  width: 52px;
+  height: 32px;
+  border-radius: 16px;
+  background: var(--control-press);
+  transition: background-color var(--dur-fade) ease;
+}
+
+.hi-switch::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.22);
+  transition: transform var(--dur-reach) var(--ease-out);
+}
+
+.hi-switch[aria-checked="true"] {
+  background: var(--ink);
+}
+
+.hi-switch[aria-checked="true"]::after {
+  background: var(--on-ink);
+}
+
+.hi-switch[aria-checked="true"]::after {
+  transform: translateX(20px);
+}
+
+.hi-switch:disabled {
+  opacity: 0.45;
+}
+
+.hi-stepper {
+  display: grid;
+  grid-template-columns: var(--tap-primary) 1fr var(--tap-primary);
+  align-items: center;
+  padding: 4px;
+  border-radius: var(--r-field);
+  background: var(--control);
+}
+
+.hi-sheet .hi-stepper {
+  background: var(--sheet-card);
+}
+
+.hi-stepper__btn {
+  display: grid;
+  place-items: center;
+  height: var(--tap);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-1);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--dur-press) var(--ease-out);
+}
+
+.hi-stepper__btn:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.hi-stepper__btn:disabled {
+  background: transparent;
+  color: var(--text-3);
+  box-shadow: none;
+}
+
+.hi-stepper__value {
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: var(--t-title2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.hi-stepper[aria-disabled="true"] .hi-stepper__value {
+  color: var(--text-3);
+}
+
+/* A level as bars that grow like a volume meter, in one row at any width. */
+.hi-levels {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 4px;
+  padding: 4px;
+  border-radius: var(--r-field);
+  background: var(--control);
+}
+
+.hi-levels__opt {
+  display: grid;
+  place-items: end center;
+  min-height: 56px;
+  padding-bottom: 12px;
+  border-radius: 12px;
+  color: var(--text-2);
+  transition:
+    background-color var(--dur-press) var(--ease-out),
+    transform var(--dur-press) var(--ease-out);
+}
+
+.hi-levels__opt:active:not(:disabled) {
+  transform: scale(0.95);
+}
+
+.hi-levels__opt[data-on] {
+  background: var(--surface);
+  box-shadow: var(--card-shadow);
+}
+
+.hi-levels__off {
+  align-self: center;
+  font-weight: 650;
+  font-size: var(--t-subhead);
+}
+
+.hi-levels__opt[data-on] .hi-levels__off {
+  color: var(--text-1);
+}
+
+.hi-levels__bar {
+  width: 10px;
+  border-radius: 3px;
+  background: var(--text-3);
+  opacity: 0.45;
+  transition:
+    background-color var(--dur-press) var(--ease-out),
+    opacity var(--dur-press) var(--ease-out);
+}
+
+.hi-levels__bar[data-lit] {
+  background: var(--ink);
+  opacity: 1;
+}
+
+.hi-input {
+  width: 100%;
+  min-height: 56px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--r-field);
+  background: var(--sheet-card);
+  font-size: var(--t-body);
+  font-weight: 500;
+}
+
+.hi-input::placeholder {
+  color: var(--text-3);
+}
+
+.hi-input:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--ink);
+}
+
+.hi-input[aria-invalid="true"] {
+  box-shadow: inset 0 0 0 2px var(--danger);
+}
+
+.hi-fieldset {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.hi-fieldset + .hi-fieldset {
+  margin-top: 32px;
+}
+
+.hi-fieldset__label {
+  padding: 0 4px 2px;
+  font-size: var(--t-subhead);
+  font-weight: 650;
+}
+
+.hi-fieldset__hint {
+  padding: 0 4px;
+  font-size: var(--t-subhead);
+  color: var(--text-2);
+}
+
+.hi-fieldset__error {
+  padding: 0 4px;
+  font-size: var(--t-subhead);
+  font-weight: 600;
+  color: var(--danger);
+}
+
+.hi-choices {
+  display: grid;
+  gap: 8px;
+}
+
+.hi-choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 72px;
+  padding: 14px 16px 14px 18px;
+  border-radius: var(--r-row);
+  background: var(--sheet-card);
+  text-align: left;
+  transition:
+    box-shadow var(--dur-fade) ease,
+    background-color var(--dur-fade) ease;
+}
+
+.hi-choice[aria-checked="true"] {
+  background: var(--ink);
+  color: var(--on-ink);
+}
+
+.hi-choice[aria-checked="true"] .hi-choice__sub {
+  color: var(--on-ink);
+  opacity: 0.86;
+}
+
+.hi-choice__body {
+  flex: 1;
+  display: grid;
+  gap: 2px;
+}
+
+.hi-choice__title {
+  font-weight: 650;
+}
+
+.hi-choice__sub {
+  font-size: var(--t-subhead);
+  color: var(--text-2);
+}
+
+.hi-choice__mark {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--text-3);
+  color: var(--ink);
+}
+
+.hi-choice[aria-checked="true"] .hi-choice__mark {
+  background: var(--on-ink);
+  box-shadow: none;
+}
+
+.hi-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.hi-stat {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 16px 16px 18px;
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow:
+    var(--card-shadow),
+    inset 0 0 0 1px var(--hairline);
+}
+
+.hi-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--t-title);
+  line-height: 1.12;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hi-stat__label {
+  font-weight: 650;
+}
+
+.hi-stat__note {
+  font-size: var(--t-subhead);
+  line-height: 1.35;
+  color: var(--text-2);
+}
+
+.hi-stat[data-empty="true"] .hi-stat__value {
+  color: var(--text-3);
+  font-family: var(--font-sans);
+  font-size: var(--t-title3);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+.hi-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--danger-wash);
+  line-height: 1.4;
+}
+
+.hi-banner > svg {
+  flex: none;
+  margin-top: 1px;
+  color: var(--danger);
+}
+
+.hi-avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--control);
+  color: var(--text-1);
+  font-size: 0.941rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.hi-empty {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  padding: 28px 12px 12px;
+  text-align: center;
+}
+
+.hi-empty h2 {
+  font-family: var(--font-display);
+  font-size: 1.647rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.hi-empty p {
+  max-width: 30ch;
+  color: var(--text-2);
+}
+
+.hi-empty .hi-btn {
+  margin-top: 12px;
+}
+
+.hi-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hi-dots span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-3);
+  opacity: 0.4;
+  transition:
+    opacity var(--dur-fade) ease,
+    width var(--dur-reach) var(--ease-out);
+}
+
+.hi-dots span[data-on="true"] {
+  width: 22px;
+  border-radius: 4px;
+  background: var(--text-1);
+  opacity: 1;
+}
+
+.hi-prose {
+  display: grid;
+  gap: 14px;
+  line-height: 1.5;
+}
+
+.hi-prose a {
+  color: var(--text-1);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.hi-list {
+  display: grid;
+  gap: 10px;
+}
+
+.hi-list li {
+  display: flex;
+  gap: 12px;
+  line-height: 1.45;
+}
+
+.hi-list li:not(:has(svg))::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  margin-top: 0.62em;
+  border-radius: 50%;
+  background: var(--text-3);
+}
+
+.hi-list li > svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--text-2);
+}

@@ -3,6 +3,7 @@ node_modules
 out
 *.tsbuildinfo
 next-env.d.ts
+__pycache__/
 
 # Built from src/platform at build time; never edited by hand.
 public/audio/

@@ -1,0 +1,184 @@
+/*
+  The device frame. On a desktop the app runs inside a drawn iPhone at its real
+  size in points (402 by 874, iPhone 16 Pro), scaled to fit the window. On a
+  phone the frame disappears and the app fills the screen, with the phone's own
+  safe areas. Only presentation lives here; the app never knows which it is in.
+*/
+.hi-stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: var(--stage);
+}
+
+.hi-device {
+  position: relative;
+  flex: none;
+  width: 430px;
+  height: 902px;
+  border-radius: 70px;
+  transform: scale(var(--device-scale, 1));
+  transform-origin: center center;
+}
+
+.hi-device__band {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: #2c2c2e;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.16),
+    inset 0 0 0 2.5px #1a1a1b,
+    inset 0 2px 1px rgba(255, 255, 255, 0.12),
+    0 40px 90px rgba(0, 0, 0, 0.28),
+    0 12px 28px rgba(0, 0, 0, 0.2);
+}
+
+.hi-device__bezel {
+  position: absolute;
+  inset: 4px;
+  border-radius: 66px;
+  background: #050505;
+}
+
+.hi-device__button {
+  position: absolute;
+  width: 5px;
+  border-radius: 3px;
+  background: #2a2a2c;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.hi-device__button[data-side="left"] {
+  left: -4px;
+}
+
+.hi-device__button[data-side="right"] {
+  right: -4px;
+}
+
+.hi-device__button[data-kind="switch"] {
+  top: 156px;
+  height: 34px;
+}
+
+.hi-device__button[data-kind="volume-up"] {
+  top: 222px;
+  height: 66px;
+}
+
+.hi-device__button[data-kind="volume-down"] {
+  top: 304px;
+  height: 66px;
+}
+
+.hi-device__button[data-kind="power"] {
+  top: 260px;
+  height: 104px;
+}
+
+.hi-screen {
+  --safe-top: 62px;
+  --safe-bottom: 34px;
+  position: absolute;
+  inset: 14px;
+  overflow: hidden;
+  border-radius: 56px;
+  background: var(--behind-sheet);
+  isolation: isolate;
+  /* A transform makes the screen the containing block for anything fixed inside it. */
+  transform: translateZ(0);
+}
+
+.hi-island {
+  position: absolute;
+  top: 11px;
+  left: 50%;
+  z-index: 60;
+  width: 126px;
+  height: 37px;
+  margin-left: -63px;
+  border-radius: 19px;
+  background: #000;
+  pointer-events: none;
+}
+
+.hi-statusbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 55;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 30px 0 46px;
+  color: var(--status-ink);
+  pointer-events: none;
+}
+
+.hi-statusbar__time {
+  font-size: 17px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  width: 54px;
+  text-align: center;
+}
+
+.hi-statusbar__icons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hi-homebar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  z-index: 60;
+  width: 140px;
+  height: 5px;
+  margin-left: -70px;
+  border-radius: 3px;
+  background: var(--status-ink);
+  pointer-events: none;
+}
+
+/* A phone, or any window too small to frame one: the app is the whole screen (device/phone.ts). */
+@media not all and (min-width: 600px) and (min-height: 540px) {
+  .hi-stage {
+    /* With the keyboard up, the app keeps to the part of the screen it leaves (PhoneFit). */
+    top: var(--vv-top, 0px);
+    bottom: auto;
+    height: var(--vv-height, 100%);
+    background: var(--bg);
+  }
+
+  .hi-device {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    transform: none;
+  }
+
+  .hi-device__band,
+  .hi-device__bezel,
+  .hi-device__button,
+  .hi-island,
+  .hi-statusbar,
+  .hi-homebar {
+    display: none;
+  }
+
+  /* The phone draws its own status bar above the app, so the top keeps only a little air. */
+  .hi-screen {
+    --safe-top: max(env(safe-area-inset-top, 0px), 8px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    inset: 0 env(safe-area-inset-right, 0px) 0 env(safe-area-inset-left, 0px);
+    border-radius: 0;
+  }
+}

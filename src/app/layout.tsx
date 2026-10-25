@@ -1,18 +1,17 @@
 import "@/styles/tokens.css";
 import "@/styles/base.css";
-import "@/styles/controls.css";
-import "@/styles/overlays.css";
+import "@/styles/device.css";
 import "@/styles/shell.css";
-import "@/styles/workspace.css";
-import "@/styles/table.css";
+import "@/styles/components.css";
+import "@/styles/features.css";
 
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import { ServiceWorkerRegistration } from "@/components/shell/ServiceWorkerRegistration";
-import { Shell } from "@/components/shell/Shell";
-import { ToastProvider } from "@/components/ui/Toast";
+import { Device } from "@/device/Device";
+import { BAR_COLOR } from "@/device/phone";
 import { BRAND } from "@/lib/brand";
-import { THEME_BOOT_SCRIPT } from "@/lib/theme";
+import { BOOT_SCRIPT } from "@/lib/theme";
+import { AppShell } from "@/shell/AppShell";
 
 export const metadata: Metadata = {
   title: { default: BRAND.name, template: `%s | ${BRAND.name}` },
@@ -22,8 +21,8 @@ export const metadata: Metadata = {
   appleWebApp: { capable: true, title: BRAND.name, statusBarStyle: "default" },
   icons: {
     icon: [
-      { url: "/icons/icon.svg", type: "image/svg+xml" },
-      { url: "/icons/icon-192.png", sizes: "192x192" },
+      { url: "/icons/favicon.svg", type: "image/svg+xml" },
+      { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
     ],
     apple: "/icons/apple-touch-icon.png",
   },
@@ -33,9 +32,11 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // Android shrinks the page above its keyboard, so sheets stay in view.
+  interactiveWidget: "resizes-content",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f3f1e8" },
-    { media: "(prefers-color-scheme: dark)", color: "#171614" },
+    { media: "(prefers-color-scheme: light)", color: BAR_COLOR.light },
+    { media: "(prefers-color-scheme: dark)", color: BAR_COLOR.dark },
   ],
 };
 
@@ -43,20 +44,26 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-theme="system" suppressHydrationWarning>
       <head>
-        {/* General Sans is served by Fontshare's API, which its license permits; the files may not be redistributed. */}
-        <link rel="preconnect" href="https://api.fontshare.com" />
-        <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
         <link
-          rel="stylesheet"
-          href="https://api.fontshare.com/v2/css?f[]=general-sans@1,2&display=swap"
+          rel="preload"
+          href="/fonts/InterVariable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
         />
-        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
+        <link
+          rel="preload"
+          href="/fonts/SourceSerif4-Variable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
-      <body className="hi-app">
-        <ToastProvider>
-          <Shell>{children}</Shell>
-        </ToastProvider>
-        <ServiceWorkerRegistration />
+      <body>
+        <Device>
+          <AppShell>{children}</AppShell>
+        </Device>
       </body>
     </html>
   );
