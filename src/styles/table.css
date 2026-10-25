@@ -25,7 +25,7 @@
 
 @media (max-width: 720px) {
   .hi-tablemap {
-    aspect-ratio: 1 / 1.1;
+    aspect-ratio: 1 / 1.2;
   }
 }
 
@@ -136,6 +136,9 @@
 .hi-seat__body {
   min-width: 0;
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .hi-seat__name {
@@ -173,6 +176,66 @@
   flex: none;
   display: flex;
   gap: 4px;
+}
+
+/* Before the first dinner: the three things to set up, each done or one tap away. */
+
+.hi-setup {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.hi-setup__title {
+  font-size: 17px;
+  line-height: 24px;
+  font-weight: 560;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.hi-setup__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  font-size: 16px;
+  line-height: 22px;
+  color: var(--text-secondary);
+}
+
+.hi-setup__mark {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid var(--border-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-accent);
+}
+
+.hi-setup__mark[data-done="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.hi-setup__row[data-done="true"] {
+  color: var(--text-tertiary);
+}
+
+.hi-setup__link {
+  color: var(--accent);
+  font-weight: 560;
+  text-decoration: none;
+}
+
+.hi-setup__link:hover {
+  text-decoration: underline;
 }
 
 /* Self-test */

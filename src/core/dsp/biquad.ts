@@ -58,6 +58,20 @@ export function highpass(fs: number, fc: number, q = Math.SQRT1_2): BiquadCoeffs
   };
 }
 
+/** Band-pass with 0 dB peak gain (RBJ cookbook); q = center over bandwidth. */
+export function bandpass(fs: number, fc: number, q: number): BiquadCoeffs {
+  const w0 = (2 * Math.PI * fc) / fs;
+  const alpha = Math.sin(w0) / (2 * q);
+  const a0 = 1 + alpha;
+  return {
+    b0: alpha / a0,
+    b1: 0,
+    b2: -alpha / a0,
+    a1: (-2 * Math.cos(w0)) / a0,
+    a2: (1 - alpha) / a0,
+  };
+}
+
 /**
  * Bilinear transform of an analog second-order section
  * (b2 s^2 + b1 s + b0) / (a2 s^2 + a1 s + a0) with s = c (1 - z^-1) / (1 + z^-1).
@@ -82,7 +96,11 @@ export function bilinear(
 }
 
 /** Magnitude response of a cascade in dB at frequency f. */
-export function cascadeResponseDb(sections: readonly BiquadCoeffs[], f: number, fs: number): number {
+export function cascadeResponseDb(
+  sections: readonly BiquadCoeffs[],
+  f: number,
+  fs: number,
+): number {
   const w = (2 * Math.PI * f) / fs;
   const c1 = Math.cos(w);
   const s1 = Math.sin(w);

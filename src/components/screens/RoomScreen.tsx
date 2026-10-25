@@ -57,8 +57,12 @@ export function RoomScreen() {
   }, []);
 
   const progress = snap.roomProgress;
-  const secondsLeft = progress === null ? ROOM_LISTEN_SECONDS : Math.ceil(ROOM_LISTEN_SECONDS * (1 - progress));
-  const cost = room.noiseDba === null ? null : noiseCostM(voiceDba, room.noiseDba, "well", room.alphaDbPerDoubling, room.kind ?? "voices");
+  const secondsLeft =
+    progress === null ? ROOM_LISTEN_SECONDS : Math.ceil(ROOM_LISTEN_SECONDS * (1 - progress));
+  const cost =
+    room.noiseDba === null
+      ? null
+      : noiseCostM(voiceDba, room.noiseDba, "well", room.alphaDbPerDoubling, room.kind ?? "voices");
 
   return (
     <>
@@ -87,12 +91,19 @@ export function RoomScreen() {
       ) : null}
 
       {listening ? (
-        <Region title="Stay quiet" note="Set the phone down where you will sit. Any voice during these seconds counts as room noise.">
+        <Region
+          title="Stay quiet"
+          note="Set the phone down where you will sit. Any voice during these seconds counts as room noise."
+        >
           <div className="hi-bars">
             <div className="hi-bar">
               <span>Listening</span>
               <span className="hi-bar__track" aria-hidden>
-                <span className="hi-bar__fill" data-tone="accent" style={{ width: `${Math.round((progress ?? 0) * 100)}%` }} />
+                <span
+                  className="hi-bar__fill"
+                  data-tone="accent"
+                  style={{ width: `${Math.round((progress ?? 0) * 100)}%` }}
+                />
               </span>
               <span className="hi-bar__val">{secondsLeft} s</span>
             </div>
@@ -117,7 +128,13 @@ export function RoomScreen() {
           />
           <Measure
             label="What it costs you"
-            value={cost === null ? "Unknown" : cost < 0.05 ? "Nothing" : fmtMeters(cost).replace("about ", "")}
+            value={
+              cost === null
+                ? "Unknown"
+                : cost < 0.05
+                  ? "Nothing"
+                  : fmtMeters(cost).replace("about ", "")
+            }
             empty={cost === null}
             note={
               cost === null
@@ -133,13 +150,15 @@ export function RoomScreen() {
       <Region title="What the number means" tight>
         <div className="hi-prose">
           <p>
-            A listener needs your voice to stand clearly above the noise around them: about 8 dB above it for someone who hears
-            well in noise, 13 dB for someone with some trouble, and 19 dB for someone with hearing aids or a lot of trouble.
-            Voices in the background mask more than a steady hum, so the kind of noise matters as well as the level.
+            A listener needs your voice to stand clearly above the noise around them: about 8 dB
+            above it for someone who hears well in noise, 13 dB for someone with some trouble, and
+            19 dB for someone with hearing aids or a lot of trouble. Voices in the background mask
+            more than a steady hum, so the kind of noise matters as well as the level.
           </p>
           <p>
-            Your voice falls about {room.alphaDbPerDoubling} dB each time the distance doubles. Put the two together and the map
-            can draw how far you reach, and how much of that this room takes away.
+            Your voice falls about {room.alphaDbPerDoubling} dB each time the distance doubles. Put
+            the two together and the map can draw how far you reach, and how much of that this room
+            takes away.
           </p>
         </div>
       </Region>

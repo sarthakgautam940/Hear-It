@@ -1,6 +1,14 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Button } from "./Button";
 
 export interface ToastOptions {
@@ -16,7 +24,9 @@ interface ToastItem extends ToastOptions {
 
 const TOAST_MS = 8000;
 
-const ToastContext = createContext<{ show: (message: string, options?: ToastOptions) => void } | null>(null);
+const ToastContext = createContext<{
+  show: (message: string, options?: ToastOptions) => void;
+} | null>(null);
 
 export function useToast() {
   const ctx = useContext(ToastContext);
@@ -66,7 +76,10 @@ function Toast({ toast, onDismiss }: { toast: ToastItem; onDismiss: (id: number)
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(1);
-  const dismiss = useCallback((id: number) => setToasts((prev) => prev.filter((t) => t.id !== id)), []);
+  const dismiss = useCallback(
+    (id: number) => setToasts((prev) => prev.filter((t) => t.id !== id)),
+    [],
+  );
   const show = useCallback((message: string, options: ToastOptions = {}) => {
     const id = nextId.current++;
     setToasts((prev) => [...prev.slice(-2), { id, message, ...options }]);

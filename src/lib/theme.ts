@@ -28,10 +28,16 @@ if(g("${CONTRAST_KEY}",["high"],"")==="high")d.dataset.contrast="high";
 if(g("${VISION_KEY}",["cvd"],"")==="cvd")d.dataset.vision="cvd";
 var s=g("${TEXTSIZE_KEY}",["large","larger"],"");if(s)d.dataset.textsize=s;})();`;
 
-export function readPreference<T extends string>(key: string, allowed: readonly T[], fallback: T): T {
+export function readPreference<T extends string>(
+  key: string,
+  allowed: readonly T[],
+  fallback: T,
+): T {
   try {
     const stored = localStorage.getItem(key);
-    return stored !== null && (allowed as readonly string[]).includes(stored) ? (stored as T) : fallback;
+    return stored !== null && (allowed as readonly string[]).includes(stored)
+      ? (stored as T)
+      : fallback;
   } catch {
     return fallback;
   }

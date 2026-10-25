@@ -81,8 +81,10 @@ const isStr = (v: unknown): v is string => typeof v === "string";
 const isNullOrNum = (v: unknown): v is number | null => v === null || isNum(v);
 const isNullOrStr = (v: unknown): v is string | null => v === null || isStr(v);
 const isEar = (v: unknown): v is EarMode => v === "left" || v === "right" || v === "both";
-const isSensitivity = (v: unknown): v is Sensitivity => v === "low" || v === "medium" || v === "high";
-const isLevel = (v: unknown): v is ChatterLevel => isNum(v) && Number.isInteger(v) && v >= 0 && v <= 5;
+const isSensitivity = (v: unknown): v is Sensitivity =>
+  v === "low" || v === "medium" || v === "high";
+const isLevel = (v: unknown): v is ChatterLevel =>
+  isNum(v) && Number.isInteger(v) && v >= 0 && v <= 5;
 
 export const DEFAULT_SETTINGS: Settings = {
   chatterLevel: 2,
@@ -106,20 +108,30 @@ export const settingsStore = createStore<Settings>("settings", DEFAULT_SETTINGS,
 /**
  * Until a meter sets it, the offset is a typical phone microphone's: speech
  * near the chest arrives around -28 dBFS and sits near 60 dBA at 1 m. Every
- * distance drawn from it is labelled estimated.
+ * distance drawn from it is labeled estimated.
  */
 export const DEFAULT_CALIBRATION: Calibration = { offsetDb: 88, measuredAt: null };
 
-export const calibrationStore = createStore<Calibration>("calibration", DEFAULT_CALIBRATION, (raw) => {
-  if (!isRecord(raw) || !isNum(raw.offsetDb) || !isNullOrStr(raw.measuredAt)) return null;
-  return { offsetDb: raw.offsetDb, measuredAt: raw.measuredAt };
-});
+export const calibrationStore = createStore<Calibration>(
+  "calibration",
+  DEFAULT_CALIBRATION,
+  (raw) => {
+    if (!isRecord(raw) || !isNum(raw.offsetDb) || !isNullOrStr(raw.measuredAt)) return null;
+    return { offsetDb: raw.offsetDb, measuredAt: raw.measuredAt };
+  },
+);
 
 export const listenersStore = createStore<Listener[]>("listeners", [], (raw) => {
   if (!Array.isArray(raw)) return null;
   const out: Listener[] = [];
   for (const item of raw) {
-    if (!isRecord(item) || !isStr(item.id) || !isStr(item.label) || !isHearing(item.hearing) || !isNum(item.distanceM)) {
+    if (
+      !isRecord(item) ||
+      !isStr(item.id) ||
+      !isStr(item.label) ||
+      !isHearing(item.hearing) ||
+      !isNum(item.distanceM)
+    ) {
       continue;
     }
     out.push({ id: item.id, label: item.label, hearing: item.hearing, distanceM: item.distanceM });
@@ -136,29 +148,41 @@ export const DEFAULT_ROOM: Room = {
 
 export const roomStore = createStore<Room>("room", DEFAULT_ROOM, (raw) => {
   if (!isRecord(raw) || !isNullOrNum(raw.noiseDba) || !isNullOrStr(raw.measuredAt)) return null;
-  const kind = raw.kind === "quiet" || raw.kind === "voices" || raw.kind === "steady" ? raw.kind : null;
+  const kind =
+    raw.kind === "quiet" || raw.kind === "voices" || raw.kind === "steady" ? raw.kind : null;
   return {
     noiseDba: raw.noiseDba,
     kind,
-    alphaDbPerDoubling: isNum(raw.alphaDbPerDoubling) ? raw.alphaDbPerDoubling : DEFAULT_ALPHA_DB_PER_DOUBLING,
+    alphaDbPerDoubling: isNum(raw.alphaDbPerDoubling)
+      ? raw.alphaDbPerDoubling
+      : DEFAULT_ALPHA_DB_PER_DOUBLING,
     measuredAt: raw.measuredAt,
   };
 });
 
 export const selfTestStore = createStore<SelfTestResult | null>("selftest", null, (raw) => {
-  if (!isRecord(raw) || !isNum(raw.gainDb) || !isNum(raw.baselineDb) || !isStr(raw.measuredAt)) return null;
+  if (!isRecord(raw) || !isNum(raw.gainDb) || !isNum(raw.baselineDb) || !isStr(raw.measuredAt))
+    return null;
   const f0 = raw.f0Range;
   const f0Range = isRecord(f0) && isNum(f0.lo) && isNum(f0.hi) ? { lo: f0.lo, hi: f0.hi } : null;
   const sentences = Array.isArray(raw.sentences)
     ? raw.sentences.flatMap((s: unknown) =>
         isRecord(s) && typeof s.boosted === "boolean" && isNum(s.leqDb)
-          ? [{ boosted: s.boosted, leqDb: s.leqDb, f0s: Array.isArray(s.f0s) ? s.f0s.filter(isNum) : [] }]
+          ? [
+              {
+                boosted: s.boosted,
+                leqDb: s.leqDb,
+                f0s: Array.isArray(s.f0s) ? s.f0s.filter(isNum) : [],
+                clarityDb: isNum(s.clarityDb) ? s.clarityDb : null,
+              },
+            ]
           : [],
       )
     : [];
   return {
     gainDb: raw.gainDb,
     baselineDb: raw.baselineDb,
+    clarityChangeDb: isNum(raw.clarityChangeDb) ? raw.clarityChangeDb : null,
     f0Range,
     sentences,
     ear: isEar(raw.ear) ? raw.ear : "left",
@@ -172,13 +196,18 @@ export const sessionsStore = createStore<Session[]>("sessions", [], (raw) => {
   if (!Array.isArray(raw)) return null;
   const out: Session[] = [];
   for (const s of raw) {
-    if (!isRecord(s) || !isStr(s.id) || !isStr(s.startedAt) || !Array.isArray(s.utterances)) continue;
+    if (!isRecord(s) || !isStr(s.id) || !isStr(s.startedAt) || !Array.isArray(s.utterances))
+      continue;
     out.push({
       id: s.id,
       startedAt: s.startedAt,
       endedAt: isNullOrStr(s.endedAt) ? s.endedAt : null,
       utterances: s.utterances.flatMap((u: unknown) =>
-        isRecord(u) && isNum(u.startMs) && isNum(u.endMs) && isNum(u.levelDba) && typeof u.chatterOn === "boolean"
+        isRecord(u) &&
+        isNum(u.startMs) &&
+        isNum(u.endMs) &&
+        isNum(u.levelDba) &&
+        typeof u.chatterOn === "boolean"
           ? [
               {
                 startMs: u.startMs,
@@ -203,11 +232,20 @@ export const sessionsStore = createStore<Session[]>("sessions", [], (raw) => {
 });
 
 export function rememberSession(session: Session): void {
-  sessionsStore.set((prev) => [session, ...prev.filter((s) => s.id !== session.id)].slice(0, MAX_SESSIONS));
+  sessionsStore.set((prev) =>
+    [session, ...prev.filter((s) => s.id !== session.id)].slice(0, MAX_SESSIONS),
+  );
 }
 
 export function clearAllData(): void {
-  for (const store of [settingsStore, calibrationStore, listenersStore, roomStore, selfTestStore, sessionsStore]) {
+  for (const store of [
+    settingsStore,
+    calibrationStore,
+    listenersStore,
+    roomStore,
+    selfTestStore,
+    sessionsStore,
+  ]) {
     (store as Store<unknown>).set(store.fallback);
   }
 }

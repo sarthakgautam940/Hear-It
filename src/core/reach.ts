@@ -24,7 +24,11 @@ export function requiredSnr(hearing: Hearing, kind: NoiseKind = "voices"): numbe
 }
 
 /** Speech level at a distance from its level at 1 m. */
-export function levelAtDistance(l1Dba: number, distanceM: number, alpha = DEFAULT_ALPHA_DB_PER_DOUBLING): number {
+export function levelAtDistance(
+  l1Dba: number,
+  distanceM: number,
+  alpha = DEFAULT_ALPHA_DB_PER_DOUBLING,
+): number {
   return l1Dba - alpha * Math.log2(distanceM);
 }
 
@@ -61,7 +65,10 @@ export function noiseCostM(
   alpha = DEFAULT_ALPHA_DB_PER_DOUBLING,
   kind: NoiseKind = "voices",
 ): number {
-  return reachM(l1Dba, QUIET_ROOM_DBA, hearing, alpha, kind) - reachM(l1Dba, noiseDba, hearing, alpha, kind);
+  return (
+    reachM(l1Dba, QUIET_ROOM_DBA, hearing, alpha, kind) -
+    reachM(l1Dba, noiseDba, hearing, alpha, kind)
+  );
 }
 
 /** The margin a seat has: speech at its distance, over the noise, over what it needs. */
@@ -72,7 +79,11 @@ export function seatMarginDb(
   alpha = DEFAULT_ALPHA_DB_PER_DOUBLING,
   kind: NoiseKind = "voices",
 ): number {
-  return levelAtDistance(l1Dba, listener.distanceM, alpha) - noiseDba - requiredSnr(listener.hearing, kind);
+  return (
+    levelAtDistance(l1Dba, listener.distanceM, alpha) -
+    noiseDba -
+    requiredSnr(listener.hearing, kind)
+  );
 }
 
 export type SeatState = "hears" | "straining" | "far";
@@ -85,6 +96,13 @@ export function seatState(marginDb: number): SeatState {
   if (marginDb > -SEAT_BAND_DB) return "straining";
   return "far";
 }
+
+/** Each seat's state as a word, so nothing rests on color alone. */
+export const SEAT_WORD: Record<SeatState, string> = {
+  hears: "hears you",
+  straining: "straining",
+  far: "too far",
+};
 
 export function inReach(listeners: readonly Listener[], reach: Record<Hearing, number>): string[] {
   return listeners.filter((l) => l.distanceM <= reach[l.hearing]).map((l) => l.id);

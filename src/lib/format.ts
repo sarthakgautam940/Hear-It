@@ -21,8 +21,9 @@ export function fmtDba(x: number): string {
 }
 
 export function fmtSignedDb(x: number, digits = 1): string {
-  const sign = x > 0 ? "+" : x < 0 ? "−" : "";
-  return `${sign}${Math.abs(x).toFixed(digits)} dB`;
+  const rounded = Number(x.toFixed(digits));
+  const sign = rounded > 0 ? "+" : rounded < 0 ? "−" : "";
+  return `${sign}${Math.abs(rounded).toFixed(digits)} dB`;
 }
 
 export function fmtPercent(x: number): string {
@@ -43,7 +44,12 @@ export function fmtDuration(seconds: number): string {
 export function fmtDate(iso: string): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  return d.toLocaleString("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
 }
 
 /** "Jane", "Jane and Tom", "Jane, Tom and Ana". */

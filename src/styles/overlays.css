@@ -109,7 +109,9 @@
 }
 
 .hi-toast--error {
-  box-shadow: var(--e2), inset 2px 0 0 var(--alarm);
+  box-shadow:
+    var(--e2),
+    inset 2px 0 0 var(--alarm);
 }
 
 @keyframes hi-toast-in {

@@ -5,7 +5,7 @@ export const LEVEL_PROCESSOR_NAME = "hearit-level";
 const WORKLET_URL = "/audio/level-processor.js";
 
 export interface Capabilities {
-  /** Whether the browser honoured the request to leave the signal unprocessed. */
+  /** Whether the browser honored the request to leave the signal unprocessed. */
   rawAudio: boolean;
   audioSession: boolean;
   sampleRate: number;
@@ -31,7 +31,10 @@ interface AudioSessionLike {
  */
 export async function openMicrophone(): Promise<Microphone> {
   if (typeof navigator === "undefined" || !navigator.mediaDevices?.getUserMedia) {
-    throw new MicrophoneError("unsupported", "This browser cannot open the microphone from a web page.");
+    throw new MicrophoneError(
+      "unsupported",
+      "This browser cannot open the microphone from a web page.",
+    );
   }
   const session = (navigator as Navigator & { audioSession?: AudioSessionLike }).audioSession;
   const audioSession = Boolean(session);
@@ -93,7 +96,10 @@ export class MicrophoneError extends Error {
     if (name === "NotFoundError" || name === "OverconstrainedError") {
       return new MicrophoneError("unsupported", "No microphone was found.");
     }
-    return new MicrophoneError("unknown", err instanceof Error ? err.message : "The microphone could not be opened.");
+    return new MicrophoneError(
+      "unknown",
+      err instanceof Error ? err.message : "The microphone could not be opened.",
+    );
   }
 }
 
@@ -152,7 +158,7 @@ export async function wireGraph(
       ramp(gateGain.gain, open ? 1 : 0, rampMs);
     },
     setEar(ear) {
-      // A full pan puts the whole signal in one channel; the centre splits it
+      // A full pan puts the whole signal in one channel; the center splits it
       // at equal power, which the controller absorbs like any other level.
       panner.pan.value = ear === "left" ? -1 : ear === "right" ? 1 : 0;
     },

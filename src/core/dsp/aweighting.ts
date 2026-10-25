@@ -42,7 +42,12 @@ export function designAWeighting(fs: number): BiquadCoeffs[] {
   const first = sections[0];
   if (!first) throw new Error("A-weighting design produced no sections");
   const gainAt1k = Math.pow(10, cascadeResponseDb(sections, 1000, fs) / 20);
-  sections[0] = { ...first, b0: first.b0 / gainAt1k, b1: first.b1 / gainAt1k, b2: first.b2 / gainAt1k };
+  sections[0] = {
+    ...first,
+    b0: first.b0 / gainAt1k,
+    b1: first.b1 / gainAt1k,
+    b2: first.b2 / gainAt1k,
+  };
   return sections;
 }
 

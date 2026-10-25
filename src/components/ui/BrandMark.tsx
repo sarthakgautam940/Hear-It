@@ -1,4 +1,4 @@
-/** Two arcs of reach over a voice: the mark, drawn in the current text colour. */
+/** Two arcs of reach over a voice: the mark, drawn in the current text color. */
 export function BrandMark({ size = 26, className }: { size?: number; className?: string }) {
   return (
     <svg

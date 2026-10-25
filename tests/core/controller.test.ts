@@ -13,7 +13,15 @@ import type { Frame } from "@/core/types";
 const cfg: ControllerConfig = { ...DEFAULT_CONTROLLER, targetDb: -24 };
 
 function frame(levelADb: number, i: number, clipped = false): Frame {
-  return { tMs: i * 20, levelDb: levelADb, levelADb, loDb: levelADb, hiDb: levelADb, f0Hz: null, clipped };
+  return {
+    tMs: i * 20,
+    levelDb: levelADb,
+    levelADb,
+    loDb: levelADb,
+    hiDb: levelADb,
+    f0Hz: null,
+    clipped,
+  };
 }
 
 describe("controller", () => {
@@ -66,7 +74,16 @@ describe("controller", () => {
   });
 
   it("measures an utterance after the reflex latency and ignores clipped frames", () => {
-    const frames = [frame(-10, 0), frame(-10, 1), frame(-10, 2), frame(-10, 3), frame(-10, 4), frame(-10, 5), frame(-10, 6), frame(-10, 7)];
+    const frames = [
+      frame(-10, 0),
+      frame(-10, 1),
+      frame(-10, 2),
+      frame(-10, 3),
+      frame(-10, 4),
+      frame(-10, 5),
+      frame(-10, 6),
+      frame(-10, 7),
+    ];
     for (let i = 8; i < 60; i++) frames.push(frame(-30, i, i === 20));
     const open = frames.map(() => true);
     const result = utteranceLeq(frames, open, true);
@@ -76,9 +93,27 @@ describe("controller", () => {
 
   it("refuses an utterance that is too short or barely gated", () => {
     const short = Array.from({ length: 30 }, (_, i) => frame(-30, i));
-    expect(utteranceLeq(short, short.map(() => true), true)).toBeNull();
+    expect(
+      utteranceLeq(
+        short,
+        short.map(() => true),
+        true,
+      ),
+    ).toBeNull();
     const long = Array.from({ length: 60 }, (_, i) => frame(-30, i));
-    expect(utteranceLeq(long, long.map((_, i) => i < 30), true)).toBeNull();
-    expect(utteranceLeq(long, long.map((_, i) => i < 30), false)).not.toBeNull();
+    expect(
+      utteranceLeq(
+        long,
+        long.map((_, i) => i < 30),
+        true,
+      ),
+    ).toBeNull();
+    expect(
+      utteranceLeq(
+        long,
+        long.map((_, i) => i < 30),
+        false,
+      ),
+    ).not.toBeNull();
   });
 });

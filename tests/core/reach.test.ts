@@ -45,7 +45,10 @@ describe("reach model", () => {
   });
 
   it("prices the room's noise against a quiet room", () => {
-    expect(noiseCostM(60, 50, "well")).toBeCloseTo(reachM(60, 40, "well") - reachM(60, 50, "well"), 9);
+    expect(noiseCostM(60, 50, "well")).toBeCloseTo(
+      reachM(60, 40, "well") - reachM(60, 50, "well"),
+      9,
+    );
     expect(noiseCostM(60, 40, "well")).toBe(0);
   });
 
@@ -73,7 +76,7 @@ describe("reach model", () => {
 describe("listeners", () => {
   it("spreads seats across the far side of the table", () => {
     expect(seatAngles(1)).toEqual([0]);
-    expect(seatAngles(3)).toEqual([-40, 0, 40]);
+    expect(seatAngles(3)).toEqual([-50, 0, 50]);
     expect(seatAngles(6)).toEqual([-70, -42, -14, 14, 42, 70]);
   });
 

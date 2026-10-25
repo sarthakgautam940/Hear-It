@@ -169,7 +169,8 @@ export function Shell({ children }: { children: ReactNode }) {
 
   const railed = collapsed && !compact;
   const current = destinationFor(pathname);
-  const liveWord = live.phase === "live" || live.phase === "starting" ? STATUS_WORD[live.status] : null;
+  const liveWord =
+    live.phase === "live" || live.phase === "starting" ? STATUS_WORD[live.status] : null;
 
   const navItem = (item: (typeof PRIMARY_NAV)[number]) => {
     const active = pathname === item.href;
@@ -201,7 +202,12 @@ export function Shell({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <CommandPalette />
-      <div className="hi-drawer-scrim" data-open={drawerOpen ? "true" : undefined} onClick={() => setDrawerOpen(false)} aria-hidden />
+      <div
+        className="hi-drawer-scrim"
+        data-open={drawerOpen ? "true" : undefined}
+        onClick={() => setDrawerOpen(false)}
+        aria-hidden
+      />
       <aside
         className="hi-sidebar"
         data-collapsed={railed}
@@ -219,8 +225,17 @@ export function Shell({ children }: { children: ReactNode }) {
         <div className="hi-nav__group">
           {SECONDARY_NAV.map(navItem)}
           {!compact ? (
-            <button type="button" onClick={toggleRail} className="hi-nav__item" aria-label={railed ? "Expand sidebar" : "Collapse sidebar"}>
-              {railed ? <PanelLeftOpen size={18} className="hi-nav__icon" aria-hidden /> : <PanelLeftClose size={18} className="hi-nav__icon" aria-hidden />}
+            <button
+              type="button"
+              onClick={toggleRail}
+              className="hi-nav__item"
+              aria-label={railed ? "Expand sidebar" : "Collapse sidebar"}
+            >
+              {railed ? (
+                <PanelLeftOpen size={18} className="hi-nav__icon" aria-hidden />
+              ) : (
+                <PanelLeftClose size={18} className="hi-nav__icon" aria-hidden />
+              )}
               {!railed ? <span className="hi-nav__label">Collapse</span> : null}
             </button>
           ) : null}
@@ -249,7 +264,13 @@ export function Shell({ children }: { children: ReactNode }) {
 
       <div className="hi-shell__body">
         <header className="hi-frost hi-topbar">
-          <button type="button" className="hi-iconbtn hi-topbar__menu" onClick={() => setDrawerOpen(true)} aria-label="Open navigation" aria-expanded={drawerOpen}>
+          <button
+            type="button"
+            className="hi-iconbtn hi-topbar__menu"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open navigation"
+            aria-expanded={drawerOpen}
+          >
             <Menu size={20} aria-hidden />
           </button>
           <nav aria-label="Breadcrumb" className="hi-breadcrumb">
@@ -275,7 +296,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 {liveWord}
               </Link>
             ) : null}
-            <button type="button" className="hi-iconbtn" onClick={toggleTheme} aria-label={theme === "night" ? "Switch to paper" : "Switch to night"}>
+            <button
+              type="button"
+              className="hi-iconbtn"
+              onClick={toggleTheme}
+              aria-label={theme === "night" ? "Switch to paper" : "Switch to night"}
+            >
               {theme === "night" ? <Sun size={19} aria-hidden /> : <Moon size={19} aria-hidden />}
             </button>
           </div>

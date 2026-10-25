@@ -78,8 +78,20 @@ export function CommandPalette() {
       run: () => applyTheme(choice),
     });
     const all: Row[] = [
-      ...ALL_NAV.map((d) => ({ label: d.label, context: d.context, keywords: d.keywords, icon: d.icon, run: go(d.href) })),
-      ...PALETTE_ACTIONS.map((a) => ({ label: a.label, context: a.context, keywords: a.keywords, icon: a.icon, run: go(a.href) })),
+      ...ALL_NAV.map((d) => ({
+        label: d.label,
+        context: d.context,
+        keywords: d.keywords,
+        icon: d.icon,
+        run: go(d.href),
+      })),
+      ...PALETTE_ACTIONS.map((a) => ({
+        label: a.label,
+        context: a.context,
+        keywords: a.keywords,
+        icon: a.icon,
+        run: go(a.href),
+      })),
       theme("paper", "Paper theme", Sun),
       theme("night", "Night theme", Moon),
       theme("system", "Follow the system theme", Monitor),
@@ -107,7 +119,13 @@ export function CommandPalette() {
         if (e.target === e.currentTarget) close();
       }}
     >
-      <div ref={panelRef} className="hi-palette__panel" role="dialog" aria-label="Go to" tabIndex={-1}>
+      <div
+        ref={panelRef}
+        className="hi-palette__panel"
+        role="dialog"
+        aria-label="Go to"
+        tabIndex={-1}
+      >
         <input
           ref={inputRef}
           className="hi-palette__input"
@@ -135,9 +153,16 @@ export function CommandPalette() {
             }
           }}
         />
-        <ul id="hi-palette-list" className="hi-palette__list" role="listbox" aria-label="Destinations">
+        <ul
+          id="hi-palette-list"
+          className="hi-palette__list"
+          role="listbox"
+          aria-label="Destinations"
+        >
           {rows.length === 0 ? (
-            <li className="hi-palette__empty">Nothing matches. Try a page name like Room, or an action like Start.</li>
+            <li className="hi-palette__empty">
+              Nothing matches. Try a page name like Room, or an action like Start.
+            </li>
           ) : (
             rows.map((row, i) => {
               const Icon = row.icon;

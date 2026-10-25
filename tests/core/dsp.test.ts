@@ -48,7 +48,10 @@ describe("modulation ratio", () => {
   const rate = 50;
 
   it("is high for a 4 Hz syllable-rate envelope", () => {
-    const env = Array.from({ length: frames }, (_, i) => -30 + 10 * Math.sin((2 * Math.PI * 4 * i) / rate));
+    const env = Array.from(
+      { length: frames },
+      (_, i) => -30 + 10 * Math.sin((2 * Math.PI * 4 * i) / rate),
+    );
     expect(modulationRatio(env, rate)).toBeGreaterThan(0.5);
   });
 
@@ -58,7 +61,10 @@ describe("modulation ratio", () => {
   });
 
   it("is low for a slow drift", () => {
-    const env = Array.from({ length: frames }, (_, i) => -30 + 6 * Math.sin((2 * Math.PI * 0.5 * i) / rate));
+    const env = Array.from(
+      { length: frames },
+      (_, i) => -30 + 6 * Math.sin((2 * Math.PI * 0.5 * i) / rate),
+    );
     expect(modulationRatio(env, rate)).toBeLessThan(0.3);
   });
 });

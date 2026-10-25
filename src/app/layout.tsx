@@ -21,7 +21,10 @@ export const metadata: Metadata = {
   manifest: "/manifest.webmanifest",
   appleWebApp: { capable: true, title: BRAND.name, statusBarStyle: "default" },
   icons: {
-    icon: [{ url: "/icons/icon.svg", type: "image/svg+xml" }, { url: "/icons/icon-192.png", sizes: "192x192" }],
+    icon: [
+      { url: "/icons/icon.svg", type: "image/svg+xml" },
+      { url: "/icons/icon-192.png", sizes: "192x192" },
+    ],
     apple: "/icons/apple-touch-icon.png",
   },
 };
@@ -40,10 +43,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" data-theme="system" suppressHydrationWarning>
       <head>
-        {/* General Sans is served by Fontshare's API, which its licence permits; the files may not be redistributed. */}
+        {/* General Sans is served by Fontshare's API, which its license permits; the files may not be redistributed. */}
         <link rel="preconnect" href="https://api.fontshare.com" />
         <link rel="preconnect" href="https://cdn.fontshare.com" crossOrigin="anonymous" />
-        <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=general-sans@1,2&display=swap" />
+        <link
+          rel="stylesheet"
+          href="https://api.fontshare.com/v2/css?f[]=general-sans@1,2&display=swap"
+        />
         <script suppressHydrationWarning dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
       </head>
       <body className="hi-app">

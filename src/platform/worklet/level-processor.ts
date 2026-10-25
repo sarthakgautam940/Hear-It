@@ -20,13 +20,21 @@ const CLIP_LEVEL = 0.99;
 class LevelProcessor extends AudioWorkletProcessor {
   private readonly frameLen = Math.round((sampleRate * FRAME_MS) / 1000);
   private readonly aWeight = createAWeightingFilter(sampleRate);
-  private readonly loBand = [new Biquad(highpass(sampleRate, 100)), new Biquad(lowpass(sampleRate, 1000))];
-  private readonly hiBand = [new Biquad(highpass(sampleRate, 1000)), new Biquad(lowpass(sampleRate, 4000))];
+  private readonly loBand = [
+    new Biquad(highpass(sampleRate, 100)),
+    new Biquad(lowpass(sampleRate, 1000)),
+  ];
+  private readonly hiBand = [
+    new Biquad(highpass(sampleRate, 1000)),
+    new Biquad(lowpass(sampleRate, 4000)),
+  ];
 
   private readonly decimation = Math.max(1, Math.round(sampleRate / 8000));
   private readonly pitchRate = sampleRate / this.decimation;
   private readonly antiAlias = new Biquad(lowpass(sampleRate, this.pitchRate * 0.4));
-  private readonly pitchWindow = new Float32Array(Math.round((this.pitchRate * PITCH_WINDOW_MS) / 1000));
+  private readonly pitchWindow = new Float32Array(
+    Math.round((this.pitchRate * PITCH_WINDOW_MS) / 1000),
+  );
   private pitchWrite = 0;
   private pitchFilled = 0;
   private decimationPhase = 0;

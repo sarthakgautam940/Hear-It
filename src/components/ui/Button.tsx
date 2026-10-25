@@ -17,7 +17,12 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   icon?: ReactNode;
 }
 
-function classes(variant: ButtonVariant, size: ButtonSize, block: boolean | undefined, className: string | undefined) {
+function classes(
+  variant: ButtonVariant,
+  size: ButtonSize,
+  block: boolean | undefined,
+  className: string | undefined,
+) {
   return cx(
     "hi-btn",
     `hi-btn--${variant}`,
@@ -28,7 +33,19 @@ function classes(variant: ButtonVariant, size: ButtonSize, block: boolean | unde
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { variant = "secondary", size = "md", block, loading = false, loadingLabel, icon, className, children, disabled, type = "button", ...rest },
+  {
+    variant = "secondary",
+    size = "md",
+    block,
+    loading = false,
+    loadingLabel,
+    icon,
+    className,
+    children,
+    disabled,
+    type = "button",
+    ...rest
+  },
   ref,
 ) {
   return (
@@ -82,7 +99,14 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
   ref,
 ) {
   return (
-    <button ref={ref} type={type} className={cx("hi-iconbtn", className)} aria-label={label} title={label} {...rest}>
+    <button
+      ref={ref}
+      type={type}
+      className={cx("hi-iconbtn", className)}
+      aria-label={label}
+      title={label}
+      {...rest}
+    >
       {children}
     </button>
   );

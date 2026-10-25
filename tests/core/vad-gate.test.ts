@@ -4,7 +4,15 @@ import type { Frame } from "@/core/types";
 import { createVad, DEFAULT_VAD, sensitivityMargin } from "@/core/vad";
 
 function frame(levelADb: number, i: number, f0Hz: number | null = null): Frame {
-  return { tMs: i * 20, levelDb: levelADb, levelADb, loDb: levelADb, hiDb: levelADb - 10, f0Hz, clipped: false };
+  return {
+    tMs: i * 20,
+    levelDb: levelADb,
+    levelADb,
+    loDb: levelADb,
+    hiDb: levelADb - 10,
+    f0Hz,
+    clipped: false,
+  };
 }
 
 function makeVad(extra: Partial<Parameters<typeof createVad>[0]> = {}) {

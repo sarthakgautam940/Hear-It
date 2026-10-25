@@ -1,5 +1,5 @@
 import type { EarMode, F0Range, SelfTestResult, SelfTestSentence } from "./types";
-import { leq } from "./dsp/level";
+import { leq, meanKnown } from "./dsp/level";
 
 /** The first ten sentences of the Rainbow Passage (Fairbanks 1960), the standard reading text in speech science. */
 export const SELF_TEST_SENTENCES: readonly string[] = [
@@ -73,6 +73,8 @@ export function summarizeSelfTest(
   const on = leq(boosted);
   const off = leq(plain);
   if (on === null || off === null) return null;
+  const clarityOn = meanKnown(sentences.filter((s) => s.boosted).map((s) => s.clarityDb));
+  const clarityOff = meanKnown(sentences.filter((s) => !s.boosted).map((s) => s.clarityDb));
   const f0s = sentences
     .filter((s) => !s.boosted)
     .flatMap((s) => s.f0s)
@@ -80,6 +82,7 @@ export function summarizeSelfTest(
   return {
     gainDb: on - off,
     baselineDb: off,
+    clarityChangeDb: clarityOn !== null && clarityOff !== null ? clarityOn - clarityOff : null,
     f0Range: f0s.length >= 10 ? percentileRange(f0s, 0.05, 0.95) : null,
     sentences: [...sentences],
     ear,

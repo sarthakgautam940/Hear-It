@@ -72,7 +72,11 @@ export function utteranceLeq(
  * negative dead-band turns the chatter off. The least noise that works,
  * including none.
  */
-export function controllerStep(gain: ChatterGain, leqDb: number, cfg: ControllerConfig): ChatterGain {
+export function controllerStep(
+  gain: ChatterGain,
+  leqDb: number,
+  cfg: ControllerConfig,
+): ChatterGain {
   const e = cfg.targetDb - leqDb;
   if (Math.abs(e) <= cfg.deadbandDb) return gain;
   if (gain === "off") return e > 0 ? cfg.minGainDb : "off";
@@ -94,7 +98,8 @@ export function utterancesToSettle(
 ): number {
   let gain: ChatterGain = cfg.minGainDb;
   const baseline = cfg.targetDb - initialErrorDb;
-  const voiceAt = (g: ChatterGain) => baseline + slope * ((g === "off" ? cfg.minGainDb : g) - cfg.minGainDb);
+  const voiceAt = (g: ChatterGain) =>
+    baseline + slope * ((g === "off" ? cfg.minGainDb : g) - cfg.minGainDb);
   for (let n = 1; n <= maxUtterances; n++) {
     gain = controllerStep(gain, voiceAt(gain), cfg);
     if (Math.abs(cfg.targetDb - voiceAt(gain)) <= cfg.deadbandDb) return n;

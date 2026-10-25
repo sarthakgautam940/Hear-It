@@ -12,7 +12,11 @@ const FOCUSABLE =
  * inside, Escape closes, the page behind does not scroll, and focus returns to
  * whatever opened it when it closes.
  */
-export function useDialogFocus(open: boolean, panelRef: RefObject<HTMLElement | null>, onClose?: () => void): void {
+export function useDialogFocus(
+  open: boolean,
+  panelRef: RefObject<HTMLElement | null>,
+  onClose?: () => void,
+): void {
   useEffect(() => {
     if (!open) return;
     const panel = panelRef.current;
@@ -65,7 +69,15 @@ export interface ModalProps {
   closeButton?: boolean;
 }
 
-export function Modal({ open, onClose, title, width = 560, children, footer, closeButton = true }: ModalProps) {
+export function Modal({
+  open,
+  onClose,
+  title,
+  width = 560,
+  children,
+  footer,
+  closeButton = true,
+}: ModalProps) {
   const panelRef = useRef<HTMLDivElement | null>(null);
   useDialogFocus(open, panelRef, onClose);
   if (!open) return null;
@@ -83,7 +95,12 @@ export function Modal({ open, onClose, title, width = 560, children, footer, clo
           tabIndex={-1}
         >
           {closeButton ? (
-            <button type="button" className="hi-iconbtn hi-modal__close" onClick={onClose} aria-label="Close">
+            <button
+              type="button"
+              className="hi-iconbtn hi-modal__close"
+              onClick={onClose}
+              aria-label="Close"
+            >
               <X size={18} aria-hidden />
             </button>
           ) : null}

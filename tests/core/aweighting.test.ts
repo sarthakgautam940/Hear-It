@@ -26,10 +26,15 @@ describe("A-weighting", () => {
   it.each([48000, 44100])("holds the analog curve at %d Hz within the stated tolerances", (fs) => {
     for (const [f, expected] of TABLE) {
       const got = aWeightingResponseDb(fs, f);
-      if (f <= 4000) expect(Math.abs(got - expected)).toBeLessThanOrEqual(0.5);
-      else if (f === 8000) expect(Math.abs(got - expected)).toBeLessThanOrEqual(1.5);
-      // Bilinear warping compresses the top octave; class 1 allows +3.5 / -17 dB at 16 kHz.
-      else expect(got).toBeLessThanOrEqual(expected + 3.5) && expect(got).toBeGreaterThanOrEqual(expected - 17);
+      if (f <= 4000) {
+        expect(Math.abs(got - expected)).toBeLessThanOrEqual(0.5);
+      } else if (f === 8000) {
+        expect(Math.abs(got - expected)).toBeLessThanOrEqual(1.5);
+      } else {
+        // Bilinear warping compresses the top octave; class 1 allows +3.5 / -17 dB at 16 kHz.
+        expect(got).toBeLessThanOrEqual(expected + 3.5);
+        expect(got).toBeGreaterThanOrEqual(expected - 17);
+      }
     }
   });
 
@@ -59,7 +64,8 @@ describe("A-weighting", () => {
       input[i] = 0.5 * Math.sin((2 * Math.PI * 63 * i) / fs);
       output[i] = filter.process(input[i] ?? 0);
     }
-    const delta = rmsToDbfs(frameRms(output.subarray(fs))) - rmsToDbfs(frameRms(input.subarray(fs)));
+    const delta =
+      rmsToDbfs(frameRms(output.subarray(fs))) - rmsToDbfs(frameRms(input.subarray(fs)));
     expect(delta).toBeCloseTo(-26.2, 0);
   });
 });

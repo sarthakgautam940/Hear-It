@@ -62,11 +62,13 @@ export interface SelfTestSentence {
   boosted: boolean;
   leqDb: number;
   f0s: number[];
+  clarityDb: number | null;
 }
 
 export interface SelfTestResult {
   gainDb: number;
   baselineDb: number;
+  clarityChangeDb: number | null;
   f0Range: F0Range | null;
   sentences: SelfTestSentence[];
   ear: EarMode;

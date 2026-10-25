@@ -197,44 +197,49 @@
   box-shadow: inset 0 0 0 1px var(--border-hairline);
 }
 
-/* Fact list: term left, value right, one axis. */
+/* Fact list: the term beside its value on one grid, rows set apart by rhythm. */
 
 .hi-deflist {
-  display: flex;
-  flex-direction: column;
-}
-
-.hi-deflist__row {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-5);
-  padding: 10px 0;
-}
-
-.hi-deflist__row + .hi-deflist__row {
-  border-top: 1px solid var(--border-hairline);
+  display: grid;
+  grid-template-columns: minmax(120px, max-content) minmax(0, 1fr);
+  column-gap: 28px;
+  row-gap: 12px;
+  margin: 0;
 }
 
 .hi-deflist__term {
   font-size: 16px;
-  line-height: 22px;
+  line-height: 24px;
   color: var(--text-tertiary);
   min-width: 0;
 }
 
 .hi-deflist__val {
+  margin: 0;
+  min-width: 0;
   font-size: 17px;
-  line-height: 22px;
+  line-height: 24px;
   font-weight: 560;
   color: var(--text-primary);
   font-variant-numeric: tabular-nums;
-  text-align: right;
 }
 
 .hi-deflist__val[data-empty="true"] {
   color: var(--text-disabled);
   font-weight: 450;
+}
+
+@media (max-width: 560px) {
+  .hi-deflist {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 2px;
+  }
+  .hi-deflist__val {
+    margin-bottom: 12px;
+  }
+  .hi-deflist__val:last-child {
+    margin-bottom: 0;
+  }
 }
 
 /* Measures: a quiet label over a large tabular value. */

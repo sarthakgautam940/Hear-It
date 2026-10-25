@@ -26,9 +26,22 @@ import type {
   Settings,
 } from "@/core/types";
 import { createVad, DEFAULT_VAD, FRAME_MS, sensitivityMargin } from "@/core/vad";
-import { MicrophoneError, openMicrophone, wireGraph, type Capabilities, type Graph, type Microphone } from "./audio";
+import {
+  MicrophoneError,
+  openMicrophone,
+  wireGraph,
+  type Capabilities,
+  type Graph,
+  type Microphone,
+} from "./audio";
 import { loadBabble, type BabbleSource } from "./babble";
-import { DEFAULT_CALIBRATION, DEFAULT_ROOM, DEFAULT_SETTINGS, newId, rememberSession } from "./storage";
+import {
+  DEFAULT_CALIBRATION,
+  DEFAULT_ROOM,
+  DEFAULT_SETTINGS,
+  newId,
+  rememberSession,
+} from "./storage";
 import { keepScreenAwake } from "./wakelock";
 
 export type EnginePhase = "idle" | "starting" | "live" | "error";
@@ -131,11 +144,13 @@ interface RoomCapture {
  * The live loop. Frames arrive from the worklet; the voice detector decides
  * whether the user is speaking; the gate opens the chatter only then; after
  * each sentence the controller moves the chatter to the least level that holds
- * the target; the reach model turns the measured levels into metres. One
+ * the target; the reach model turns the measured levels into meters. One
  * instance per page, subscribed to from React through a snapshot.
  */
 class Engine {
   private snap: EngineSnapshot = INITIAL;
+  /** What React reads; its identity changes only when listeners are told, so renders follow emits. */
+  private published: EngineSnapshot = INITIAL;
   private readonly listeners = new Set<() => void>();
   private readonly utteranceListeners = new Set<(u: UtteranceEvent) => void>();
   private inputs: EngineInputs = {
@@ -168,7 +183,7 @@ class Engine {
     return () => this.listeners.delete(listener);
   };
 
-  getSnapshot = (): EngineSnapshot => this.snap;
+  getSnapshot = (): EngineSnapshot => this.published;
 
   onUtterance(listener: (u: UtteranceEvent) => void): () => void {
     this.utteranceListeners.add(listener);
@@ -236,12 +251,7 @@ class Engine {
   async stop(): Promise<void> {
     if (this.snap.phase === "idle") return;
     this.finishUtterance();
-    const session = this.session;
-    if (session && this.snap.mode === "table") {
-      session.endedAt = new Date().toISOString();
-      session.noiseDba = this.currentNoiseDba();
-      if (session.utterances.length > 0) rememberSession(session);
-    }
+    this.closeSession();
     await this.teardown();
     this.patch({ ...INITIAL }, true);
   }
@@ -249,6 +259,7 @@ class Engine {
   setMode(mode: EngineMode): void {
     if (this.snap.mode === mode && this.snap.phase === "live") return;
     this.finishUtterance();
+    this.closeSession();
     this.forcedChatter = null;
     this.roomCapture = null;
     if (mode === "table") {
@@ -259,10 +270,19 @@ class Engine {
       );
       this.setGain(levelToGain(this.inputs.settings.chatterLevel));
     } else {
-      this.session = null;
       this.setGain("off");
     }
-    this.patch({ mode, utteranceCount: 0, speechSeconds: 0, chatterSeconds: 0, dosePercent: 0, roomProgress: null }, true);
+    this.patch(
+      {
+        mode,
+        utteranceCount: 0,
+        speechSeconds: 0,
+        chatterSeconds: 0,
+        dosePercent: 0,
+        roomProgress: null,
+      },
+      true,
+    );
   }
 
   /** Self-test: force the chatter on or off for the next sentence; null returns to normal. */
@@ -300,6 +320,16 @@ class Engine {
     this.lastL1Dbfs = null;
     this.floorDbfs = null;
     this.paused = false;
+  }
+
+  /** A table session with any sentence in it is kept, whether Stop or a mode change ended it. */
+  private closeSession(): void {
+    const session = this.session;
+    this.session = null;
+    if (!session) return;
+    session.endedAt = new Date().toISOString();
+    session.noiseDba = this.currentNoiseDba();
+    if (session.utterances.length > 0) rememberSession(session);
   }
 
   private setGain(gain: ChatterGain): void {
@@ -355,7 +385,12 @@ class Engine {
     if (this.utterance && this.utterance.frames.length >= 15) {
       this.lastL1Dbfs = leq(this.utterance.frames.slice(7).map((f) => f.levelADb));
     }
-    this.snap = { ...this.snap, speaking: vad.speaking, gateOpen: gateIsOpen(state), chatterAudible: audible };
+    this.snap = {
+      ...this.snap,
+      speaking: vad.speaking,
+      gateOpen: gateIsOpen(state),
+      chatterAudible: audible,
+    };
     this.snap.levelDba = smoothed + this.inputs.calibration.offsetDb;
     this.recompute(false);
   }
@@ -412,7 +447,11 @@ class Engine {
     if (!capture) return;
     capture.levels.push(frame.levelADb);
     const progress = Math.min(1, capture.levels.length / capture.needed);
-    this.snap = { ...this.snap, roomProgress: progress, levelDba: frame.levelADb + this.inputs.calibration.offsetDb };
+    this.snap = {
+      ...this.snap,
+      roomProgress: progress,
+      levelDba: frame.levelADb + this.inputs.calibration.offsetDb,
+    };
     if (capture.levels.length < capture.needed) return;
     this.roomCapture = null;
     const laeq = leq(capture.levels) ?? -120;
@@ -494,6 +533,7 @@ class Engine {
     const now = performance.now();
     if (!force && now - this.lastEmit < EMIT_EVERY_MS) return;
     this.lastEmit = now;
+    this.published = this.snap;
     for (const l of this.listeners) l();
   }
 

@@ -71,7 +71,8 @@ export function SettingsScreen() {
     setTextSize(readPreference(TEXTSIZE_KEY, TEXTSIZE_CHOICES, "default"));
   }, []);
 
-  const update = (patch: Partial<typeof settings>) => settingsStore.set((s) => ({ ...s, ...patch }));
+  const update = (patch: Partial<typeof settings>) =>
+    settingsStore.set((s) => ({ ...s, ...patch }));
 
   return (
     <>
@@ -101,7 +102,14 @@ export function SettingsScreen() {
                 : "Needs your usual voice from the self-test first."
             }
             disabled={!selfTest}
-            control={<Switch label="Adaptive chatter" checked={settings.adaptive} disabled={!selfTest} onChange={(adaptive) => update({ adaptive })} />}
+            control={
+              <Switch
+                label="Adaptive chatter"
+                checked={settings.adaptive}
+                disabled={!selfTest}
+                onChange={(adaptive) => update({ adaptive })}
+              />
+            }
           />
           <SettingRow
             title="Target"
@@ -122,12 +130,26 @@ export function SettingsScreen() {
           <SettingRow
             title="Earbud"
             note="One ear leaves the other free for the table. Both ears is louder and hides the room: restaurant mode."
-            control={<SegmentedControl aria-label="Earbud ear" options={EAR_OPTIONS} value={settings.ear} onChange={(ear) => update({ ear })} />}
+            control={
+              <SegmentedControl
+                aria-label="Earbud ear"
+                options={EAR_OPTIONS}
+                value={settings.ear}
+                onChange={(ear) => update({ ear })}
+              />
+            }
           />
           <SettingRow
             title="Sensitivity"
             note="How readily the app decides you are speaking. Raise it if the chatter misses your first words; lower it if the room sets it off."
-            control={<SegmentedControl aria-label="Sensitivity" options={SENSITIVITY_OPTIONS} value={settings.sensitivity} onChange={(sensitivity) => update({ sensitivity })} />}
+            control={
+              <SegmentedControl
+                aria-label="Sensitivity"
+                options={SENSITIVITY_OPTIONS}
+                value={settings.sensitivity}
+                onChange={(sensitivity) => update({ sensitivity })}
+              />
+            }
           />
         </SettingGroup>
       </Region>
@@ -145,15 +167,24 @@ export function SettingsScreen() {
           />
           <SettingRow
             title="Self-test"
-            note={selfTest ? `Your gain was ${fmtSignedDb(selfTest.gainDb)} on ${fmtDate(selfTest.measuredAt)}.` : "Not run yet."}
+            note={
+              selfTest
+                ? `Your gain was ${fmtSignedDb(selfTest.gainDb)} on ${fmtDate(selfTest.measuredAt)}.`
+                : "Not run yet."
+            }
             control={
-              <Button onClick={() => (window.location.href = "/self-test")}>{selfTest ? "Run again" : "Run it"}</Button>
+              <Button onClick={() => (window.location.href = "/self-test")}>
+                {selfTest ? "Run again" : "Run it"}
+              </Button>
             }
           />
         </SettingGroup>
       </Region>
 
-      <Region title="Appearance" note="These describe the phone you read on, so they are kept per browser.">
+      <Region
+        title="Appearance"
+        note="These describe the phone you read on, so they are kept per browser."
+      >
         <SettingGroup>
           <SettingRow
             title="Theme"
@@ -212,11 +243,11 @@ export function SettingsScreen() {
             }
           />
           <SettingRow
-            title="Colour-blind safe"
-            note="Swaps the accent, caution and alarm colours for ones that differ in brightness too. Every state is also a word."
+            title="Color-blind safe"
+            note="Swaps the accent, caution and alarm colors for ones that differ in brightness too. Every state is also a word."
             control={
               <SegmentedControl
-                aria-label="Colour-blind safe palette"
+                aria-label="Color-blind safe palette"
                 value={vision}
                 onChange={(next) => {
                   setVision(next);
@@ -254,7 +285,10 @@ export function SettingsScreen() {
         <DeviceCheck />
       </Region>
 
-      <Region title="Your data" note="Nothing leaves this phone. There are no accounts and no recordings; the app keeps levels, never sound.">
+      <Region
+        title="Your data"
+        note="Nothing leaves this phone. There are no accounts and no recordings; the app keeps levels, never sound."
+      >
         <SettingGroup>
           <SettingRow
             title="Clear everything"
@@ -318,15 +352,29 @@ function DeviceCheck() {
         <div className="hi-setrow">
           <DefList
             rows={[
-              { term: "Unprocessed microphone", value: caps.rawAudio ? "Yes" : "No, the browser kept some processing on" },
+              {
+                term: "Unprocessed microphone",
+                value: caps.rawAudio ? "Yes" : "No, the browser kept some processing on",
+              },
               { term: "Sample rate", value: `${caps.sampleRate} Hz` },
-              { term: "Chatter", value: snap.babbleSource === "recorded" ? "Recorded six-talker file" : "Built-in synthesized chatter" },
-              { term: "Audio session control", value: caps.audioSession ? "Yes" : "Not on this browser" },
+              {
+                term: "Chatter",
+                value:
+                  snap.babbleSource === "recorded"
+                    ? "Recorded six-talker file"
+                    : "Built-in synthesized chatter",
+              },
+              {
+                term: "Audio session control",
+                value: caps.audioSession ? "Yes" : "Not on this browser",
+              },
             ]}
           />
         </div>
       ) : null}
-      {snap.phase === "error" && snap.error ? <div className="hi-setrow hi-micro">{snap.error}</div> : null}
+      {snap.phase === "error" && snap.error ? (
+        <div className="hi-setrow hi-micro">{snap.error}</div>
+      ) : null}
     </SettingGroup>
   );
 }
@@ -373,7 +421,10 @@ function CalibrationModal({ open, onClose }: { open: boolean; onClose: () => voi
       setError("Enter the meter's reading in dBA, between 40 and 100.");
       return;
     }
-    calibrationStore.set({ offsetDb: Math.round((value - heardDbfs) * 10) / 10, measuredAt: new Date().toISOString() });
+    calibrationStore.set({
+      offsetDb: Math.round((value - heardDbfs) * 10) / 10,
+      measuredAt: new Date().toISOString(),
+    });
     toast.show("Calibrated. Levels on the map are now in dBA at 1 m.");
     close();
   }
@@ -395,24 +446,41 @@ function CalibrationModal({ open, onClose }: { open: boolean; onClose: () => voi
     >
       <div className="hi-stack">
         <p>
-          Put a sound meter 1 m from your mouth, set to the A-weighted average. Keep the phone where you will wear it. Tap Listen, read the
-          sentence below, then type what the meter shows.
+          Put a sound meter 1 m from your mouth, set to the A-weighted average. Keep the phone where
+          you will wear it. Tap Listen, read the sentence below, then type what the meter shows.
         </p>
         <p className="hi-sentence" style={{ fontSize: 22, lineHeight: "30px" }}>
           {SELF_TEST_SENTENCES[0]}
         </p>
         {!live ? (
-          <Button variant="primary" loading={snap.phase === "starting"} loadingLabel="Starting" onClick={() => void startListening()}>
+          <Button
+            variant="primary"
+            loading={snap.phase === "starting"}
+            loadingLabel="Starting"
+            onClick={() => void startListening()}
+          >
             Listen
           </Button>
         ) : (
           <p className="hi-micro" aria-live="polite">
-            {heardDbfs === null ? (snap.speaking ? "Hearing you." : "Listening. Read the sentence.") : `Heard the sentence at ${heardDbfs.toFixed(1)} dB relative to full scale. Read again to replace it.`}
+            {heardDbfs === null
+              ? snap.speaking
+                ? "Hearing you."
+                : "Listening. Read the sentence."
+              : `Heard the sentence at ${heardDbfs.toFixed(1)} dB relative to full scale. Read again to replace it.`}
           </p>
         )}
         <Field label="The meter's reading, dBA" error={error}>
           {({ id, describedBy, invalid }) => (
-            <Input id={id} aria-describedby={describedBy} invalid={invalid} inputMode="decimal" value={meter} onChange={(e) => setMeter(e.target.value)} placeholder="62" />
+            <Input
+              id={id}
+              aria-describedby={describedBy}
+              invalid={invalid}
+              inputMode="decimal"
+              value={meter}
+              onChange={(e) => setMeter(e.target.value)}
+              placeholder="62"
+            />
           )}
         </Field>
       </div>

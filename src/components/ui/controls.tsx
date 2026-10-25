@@ -132,7 +132,8 @@ export function Field({ label, hint, error, children }: FieldProps) {
   const id = useId();
   const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
-  const describedBy = [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
   return (
     <div className="hi-field">
       <label className="hi-field__label" htmlFor={id}>
@@ -155,8 +156,18 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalid?: boolean;
 }
 
-export const Input = forwardRef<HTMLInputElement, InputProps>(function Input({ invalid, className, ...rest }, ref) {
-  return <input ref={ref} className={cx("hi-input", className)} aria-invalid={invalid || undefined} {...rest} />;
+export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
+  { invalid, className, ...rest },
+  ref,
+) {
+  return (
+    <input
+      ref={ref}
+      className={cx("hi-input", className)}
+      aria-invalid={invalid || undefined}
+      {...rest}
+    />
+  );
 });
 
 export function Banner({

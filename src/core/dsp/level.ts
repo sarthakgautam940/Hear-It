@@ -27,6 +27,13 @@ export function leq(levelsDb: readonly number[]): number | null {
   return 10 * Math.log10(sum / levelsDb.length);
 }
 
+/** Plain mean of the values that were measured; null when none were. */
+export function meanKnown(values: readonly (number | null)[]): number | null {
+  const known = values.filter((v): v is number => v !== null);
+  if (known.length === 0) return null;
+  return known.reduce((a, b) => a + b, 0) / known.length;
+}
+
 /**
  * A first-order exponential smoother on sound energy, which is what a meter's
  * "fast" setting is. The first value seeds the state so the display does not

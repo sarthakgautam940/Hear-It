@@ -2,6 +2,7 @@ node_modules
 .next
 out
 *.tsbuildinfo
+next-env.d.ts
 
 # Built from src/platform at build time; never edited by hand.
 public/audio/

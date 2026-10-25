@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { cx } from "@/lib/cx";
 
 /** The heading band: one object per surface, the title and one state sentence. */
@@ -81,7 +81,10 @@ export function SettingRow({
   disabled?: boolean;
 }) {
   return (
-    <div className={cx("hi-setrow", stack && "hi-setrow--stack")} data-disabled={disabled ? "true" : undefined}>
+    <div
+      className={cx("hi-setrow", stack && "hi-setrow--stack")}
+      data-disabled={disabled ? "true" : undefined}
+    >
       <div className="hi-setrow__text">
         <div className="hi-setrow__title">{title}</div>
         {note ? <div className="hi-setrow__note">{note}</div> : null}
@@ -100,7 +103,11 @@ export function Surface({
   className?: string;
   children: ReactNode;
 }) {
-  return <div className={cx("hi-panel", "hi-panel--pad", inset && "hi-panel--inset", className)}>{children}</div>;
+  return (
+    <div className={cx("hi-panel", "hi-panel--pad", inset && "hi-panel--inset", className)}>
+      {children}
+    </div>
+  );
 }
 
 /** The page keeps its anatomy and names the one next act. */
@@ -135,12 +142,12 @@ export function DefList({ rows }: { rows: DefRow[] }) {
   return (
     <dl className="hi-deflist">
       {rows.map((row, i) => (
-        <div className="hi-deflist__row" key={i}>
+        <Fragment key={i}>
           <dt className="hi-deflist__term">{row.term}</dt>
-          <dd className="hi-deflist__val" data-empty={row.empty ? "true" : undefined} style={{ margin: 0 }}>
+          <dd className="hi-deflist__val" data-empty={row.empty ? "true" : undefined}>
             {row.value}
           </dd>
-        </div>
+        </Fragment>
       ))}
     </dl>
   );

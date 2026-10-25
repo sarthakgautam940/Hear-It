@@ -7,7 +7,15 @@ import { Field, Input, SegmentedControl } from "@/components/ui/controls";
 import { ConfirmModal, Modal } from "@/components/ui/Modal";
 import { PageHead, Standing } from "@/components/ui/structure";
 import { useToast } from "@/components/ui/Toast";
-import { HEARING_LABEL, HEARING_SHORT, initials, MAX_LABEL_LENGTH, MAX_LISTENERS, newListener, SEAT_DISTANCES_M } from "@/core/listeners";
+import {
+  HEARING_LABEL,
+  HEARING_SHORT,
+  initials,
+  MAX_LABEL_LENGTH,
+  MAX_LISTENERS,
+  newListener,
+  SEAT_DISTANCES_M,
+} from "@/core/listeners";
 import type { Hearing, Listener } from "@/core/types";
 import { useStore } from "@/hooks/useStore";
 import { fmtMetersShort } from "@/lib/format";
@@ -114,7 +122,12 @@ export function PeopleScreen() {
                     label={`Edit ${l.label}`}
                     onClick={() => {
                       setError(null);
-                      setDraft({ id: l.id, label: l.label, hearing: l.hearing, distanceM: l.distanceM });
+                      setDraft({
+                        id: l.id,
+                        label: l.label,
+                        hearing: l.hearing,
+                        distanceM: l.distanceM,
+                      });
                     }}
                   >
                     <Pencil size={18} aria-hidden />
@@ -183,11 +196,16 @@ export function PeopleScreen() {
               <SegmentedControl
                 aria-label="Seat distance"
                 block
-                options={SEAT_DISTANCES_M.map((m) => ({ value: String(m), label: fmtMetersShort(m) }))}
+                options={SEAT_DISTANCES_M.map((m) => ({
+                  value: String(m),
+                  label: fmtMetersShort(m),
+                }))}
                 value={String(draft.distanceM)}
                 onChange={(v) => setDraft({ ...draft, distanceM: Number(v) })}
               />
-              <span className="hi-field__hint">Across a dinner table is about 1.5 m. The far end of a long table is about 2.5 m.</span>
+              <span className="hi-field__hint">
+                Across a dinner table is about 1.5 m. The far end of a long table is about 2.5 m.
+              </span>
             </div>
           </div>
         ) : null}
@@ -196,9 +214,15 @@ export function PeopleScreen() {
       <ConfirmModal
         open={removing !== null}
         onClose={() => setRemoving(null)}
-        onConfirm={() => removing && remove(removing)}
+        onConfirm={() => {
+          if (removing) remove(removing);
+        }}
         title="Remove from the table?"
-        consequence={removing ? `${removing.label} (${HEARING_SHORT[removing.hearing]}) leaves the map. You can undo this for a few seconds.` : ""}
+        consequence={
+          removing
+            ? `${removing.label} (${HEARING_SHORT[removing.hearing]}) leaves the map. You can undo this for a few seconds.`
+            : ""
+        }
         confirmLabel="Remove"
       />
     </>

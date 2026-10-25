@@ -76,7 +76,9 @@
 
 .hi-btn--secondary:hover:not(:disabled) {
   background: var(--bg-surface2);
-  box-shadow: 0 0 0 1px var(--border-strong), var(--surface-toplight);
+  box-shadow:
+    0 0 0 1px var(--border-strong),
+    var(--surface-toplight);
 }
 
 .hi-btn--ghost {

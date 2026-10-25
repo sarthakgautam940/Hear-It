@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useEffect } from "react";
-import { Mic, Pause, Play, Square, Volume2, VolumeX } from "lucide-react";
+import { Check, Mic, Pause, Play, Square, Volume2, VolumeX } from "lucide-react";
 import { ReachCanvas, type Seat } from "@/components/table/ReachCanvas";
-import { Button, LinkButton } from "@/components/ui/Button";
+import { Button } from "@/components/ui/Button";
 import { Banner } from "@/components/ui/controls";
 import { useToast } from "@/components/ui/Toast";
-import { HEARING_SHORT, seatAngles } from "@/core/listeners";
-import { seatMarginDb, seatState, type SeatState } from "@/core/reach";
+import { HEARING_SHORT, initials, seatAngles } from "@/core/listeners";
+import { REACH_MAX_M, SEAT_WORD, seatMarginDb, seatState } from "@/core/reach";
 import { useEngine } from "@/hooks/useEngine";
 import { useStore } from "@/hooks/useStore";
 import { fmtDba, fmtMeters, fmtMetersShort, listNames } from "@/lib/format";
@@ -30,6 +30,19 @@ const MIC_HELP: Record<string, string> = {
   unsupported: "Open this page in Safari on iPhone or Chrome on Android.",
   unknown: "Try again. If it keeps failing, reload the page.",
 };
+
+type SetupKey = "people" | "room" | "selfTest";
+
+const SETUP: ReadonlyArray<{ key: SetupKey; href: string; todo: string; done: string }> = [
+  { key: "people", href: "/people", todo: "Add the people at your table", done: "People added" },
+  { key: "room", href: "/room", todo: "Listen to the room for ten seconds", done: "Room measured" },
+  {
+    key: "selfTest",
+    href: "/self-test",
+    todo: "Run the two-minute self-test",
+    done: "Self-test done",
+  },
+];
 
 export function TableScreen() {
   const snap = useEngine();
@@ -58,9 +71,20 @@ export function TableScreen() {
         : null,
   }));
 
-  const { headline, sub } = describe(seats, snap.reach?.well ?? null, snap.reach?.some ?? null, live);
+  const { headline, sub } = describe(
+    seats,
+    snap.reach?.well ?? null,
+    snap.reach?.some ?? null,
+    live,
+  );
   const status = STATUS[snap.status];
   const StatusIcon = status.icon;
+  const setup: Record<SetupKey, boolean> = {
+    people: listeners.length > 0,
+    room: room.noiseDba !== null,
+    selfTest: selfTest !== null,
+  };
+  const setupComplete = setup.people && setup.room && setup.selfTest;
 
   async function stop() {
     const count = snap.utteranceCount;
@@ -109,7 +133,12 @@ export function TableScreen() {
 
         <div className="hi-start" style={{ marginTop: 24 }}>
           {live ? (
-            <Button size="xl" variant="secondary" icon={<Square size={22} aria-hidden />} onClick={stop}>
+            <Button
+              size="xl"
+              variant="secondary"
+              icon={<Square size={22} aria-hidden />}
+              onClick={stop}
+            >
               Stop
             </Button>
           ) : (
@@ -134,24 +163,13 @@ export function TableScreen() {
           </div>
         ) : null}
 
-        {live && snap.babbleSource === "synthesized" ? (
-          <p className="hi-micro" style={{ marginTop: 14 }}>
-            Playing the built-in chatter. Add the recorded six-talker file to use it instead.
-          </p>
-        ) : null}
-
-        <div style={{ marginTop: 28 }}>
-          {seats.length === 0 ? (
-            <p className="hi-prose" style={{ fontSize: 17 }}>
-              Add the people at your table and the map will show who can hear you.{" "}
-              <Link href="/people">Add people</Link>
-            </p>
-          ) : (
+        {seats.length > 0 ? (
+          <div style={{ marginTop: 28 }}>
             <ul className="hi-seatlist">
               {seats.map((seat) => (
                 <li className="hi-seat" key={seat.id}>
                   <span className="hi-seat__chip" aria-hidden>
-                    {initialsOf(seat.label)}
+                    {initials(seat.label)}
                   </span>
                   <span className="hi-seat__body">
                     <span className="hi-seat__name">{seat.label}</span>
@@ -165,14 +183,12 @@ export function TableScreen() {
                 </li>
               ))}
             </ul>
-          )}
-        </div>
+          </div>
+        ) : null}
 
-        {!selfTest ? (
-          <div style={{ marginTop: 24 }}>
-            <LinkButton href="/self-test" variant="ghost">
-              Run the two-minute self-test to learn your own gain
-            </LinkButton>
+        {!live && !setupComplete ? (
+          <div style={{ marginTop: 32 }}>
+            <SetupSteps state={setup} />
           </div>
         ) : null}
       </aside>
@@ -180,16 +196,51 @@ export function TableScreen() {
   );
 }
 
-const SEAT_WORD: Record<SeatState, string> = { hears: "hears you", straining: "straining", far: "too far" };
-
-function initialsOf(label: string): string {
-  const words = label.trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return "?";
-  if (words.length === 1) return (words[0] ?? "").slice(0, 2).toUpperCase();
-  return ((words[0]?.[0] ?? "") + (words[words.length - 1]?.[0] ?? "")).toUpperCase();
+/* The three things to set up, each done or one tap away; gone once all three are. */
+function SetupSteps({ state }: { state: Record<SetupKey, boolean> }) {
+  return (
+    <section aria-labelledby="hi-setup-title">
+      <h2 id="hi-setup-title" className="hi-setup__title">
+        Before the first dinner
+      </h2>
+      <ul className="hi-setup">
+        {SETUP.map((step) => {
+          const done = state[step.key];
+          return (
+            <li key={step.key} className="hi-setup__row" data-done={done ? "true" : undefined}>
+              <span className="hi-setup__mark" data-done={done ? "true" : undefined} aria-hidden>
+                {done ? <Check size={15} strokeWidth={3} /> : null}
+              </span>
+              {done ? (
+                <span>{step.done}</span>
+              ) : (
+                <Link href={step.href} className="hi-setup__link">
+                  {step.todo}
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
 }
 
-function describe(seats: Seat[], reachWell: number | null, reachSome: number | null, live: boolean) {
+function reachSentence(well: number, some: number | null): string {
+  if (well >= REACH_MAX_M && (some === null || some >= REACH_MAX_M)) {
+    return "Your voice carries across the whole room, even for someone with some trouble in noise.";
+  }
+  const forSome =
+    some === null ? "" : `, and ${fmtMeters(some)} for someone with some trouble in noise`;
+  return `Your voice reaches ${fmtMeters(well)} for someone who hears well${forSome}.`;
+}
+
+function describe(
+  seats: Seat[],
+  reachWell: number | null,
+  reachSome: number | null,
+  live: boolean,
+) {
   if (!live) {
     return {
       headline: "Sit down, tap Start, and talk.",
@@ -199,9 +250,7 @@ function describe(seats: Seat[], reachWell: number | null, reachSome: number | n
   if (reachWell === null) {
     return { headline: "Say something.", sub: "The first sentence sets the map." };
   }
-  const reachLine = `Your voice reaches ${fmtMeters(reachWell)} for someone who hears well${
-    reachSome !== null ? `, and ${fmtMeters(reachSome)} for someone with some trouble in noise` : ""
-  }.`;
+  const reachLine = reachSentence(reachWell, reachSome);
   if (seats.length === 0) {
     return { headline: `Reaches ${fmtMeters(reachWell)}`, sub: reachLine };
   }
@@ -213,7 +262,10 @@ function describe(seats: Seat[], reachWell: number | null, reachSome: number | n
   if (far.length > 0) {
     return {
       headline: `${listNames(far)} can't hear you.`,
-      sub: straining.length > 0 ? `${listNames(straining)} ${straining.length === 1 ? "is" : "are"} straining. ${reachLine}` : reachLine,
+      sub:
+        straining.length > 0
+          ? `${listNames(straining)} ${straining.length === 1 ? "is" : "are"} straining. ${reachLine}`
+          : reachLine,
     };
   }
   return {

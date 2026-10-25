@@ -20,7 +20,7 @@ export const HEARING_SHORT: Record<Hearing, string> = {
 export function seatAngles(count: number): number[] {
   if (count <= 0) return [];
   if (count === 1) return [0];
-  const span = Math.min(140, 40 * (count - 1));
+  const span = Math.min(140, 50 * (count - 1));
   return Array.from({ length: count }, (_, i) => -span / 2 + (span * i) / (count - 1));
 }
 
@@ -31,7 +31,12 @@ export function initials(label: string): string {
   return ((words[0]?.[0] ?? "") + (words[words.length - 1]?.[0] ?? "")).toUpperCase();
 }
 
-export function newListener(id: string, label: string, hearing: Hearing, distanceM: number): Listener {
+export function newListener(
+  id: string,
+  label: string,
+  hearing: Hearing,
+  distanceM: number,
+): Listener {
   return { id, label: label.trim().slice(0, MAX_LABEL_LENGTH), hearing, distanceM };
 }
 
